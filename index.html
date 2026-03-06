@@ -313,10 +313,165 @@ iframe.visible {
   .idea-count { display: none; }
   .ai-badge span.ai-label { display: none; }
 }
+
+/* ─── PASSWORD GATE ─── */
+.gate-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1), visibility 0.6s;
+}
+.gate-overlay.dismissed {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.gate-card {
+  width: 380px;
+  max-width: 90vw;
+  background: #0A0A0A;
+  border: 1px solid rgba(148,163,184,0.12);
+  border-radius: 16px;
+  padding: 48px 36px 40px;
+  text-align: center;
+  box-shadow: 0 0 80px rgba(46,139,122,0.08), 0 2px 20px rgba(0,0,0,0.4);
+}
+.gate-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+.gate-logo svg { width: 36px; height: 36px; color: #2E8B7A; }
+.gate-logo-text { font-family: 'DM Serif Display', serif; font-size: 24px; color: #F1F5F9; letter-spacing: -0.02em; }
+.gate-subtitle {
+  font-size: 13px;
+  color: #64748B;
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+.gate-input-wrap {
+  position: relative;
+  margin-bottom: 16px;
+}
+.gate-input {
+  width: 100%;
+  height: 48px;
+  background: #111;
+  border: 1px solid rgba(148,163,184,0.15);
+  border-radius: 10px;
+  padding: 0 48px 0 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: #F1F5F9;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+.gate-input::placeholder { color: #475569; }
+.gate-input:focus {
+  border-color: rgba(46,139,122,0.5);
+  box-shadow: 0 0 0 3px rgba(46,139,122,0.1);
+}
+.gate-input.shake {
+  animation: gateShake 0.5s ease;
+  border-color: #EF4444;
+}
+@keyframes gateShake {
+  0%, 100% { transform: translateX(0); }
+  15%, 45%, 75% { transform: translateX(-6px); }
+  30%, 60%, 90% { transform: translateX(6px); }
+}
+.gate-eye {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #475569;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+.gate-eye:hover { color: #94A3B8; }
+.gate-btn {
+  width: 100%;
+  height: 46px;
+  background: linear-gradient(135deg, #2E8B7A, #236b5f);
+  border: none;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: transform 0.15s, box-shadow 0.25s, opacity 0.2s;
+}
+.gate-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(46,139,122,0.3);
+}
+.gate-btn:active { transform: translateY(0); }
+.gate-error {
+  font-size: 12px;
+  color: #EF4444;
+  margin-top: 12px;
+  min-height: 18px;
+  transition: opacity 0.2s;
+}
+.gate-footer {
+  margin-top: 28px;
+  font-size: 11px;
+  color: #334155;
+  line-height: 1.5;
+}
+.app.locked {
+  display: none !important;
+}
 </style>
 </head>
 <body>
-<div class="app">
+
+<!-- ─── PASSWORD GATE ─── -->
+<div class="gate-overlay" id="gateOverlay">
+  <div class="gate-card">
+    <div class="gate-logo">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="28" height="28" rx="6" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+        <circle cx="10" cy="10" r="3" fill="currentColor" opacity="0.6"/>
+        <circle cx="22" cy="10" r="3" fill="currentColor" opacity="0.6"/>
+        <circle cx="10" cy="22" r="3" fill="currentColor" opacity="0.6"/>
+        <circle cx="22" cy="22" r="3" fill="currentColor" opacity="0.6"/>
+        <circle cx="16" cy="16" r="4" fill="currentColor"/>
+        <line x1="13" y1="13" x2="10" y2="10" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
+        <line x1="19" y1="13" x2="22" y2="10" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
+        <line x1="13" y1="19" x2="10" y2="22" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
+        <line x1="19" y1="19" x2="22" y2="22" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
+      </svg>
+      <span class="gate-logo-text">IPCo</span>
+    </div>
+    <div class="gate-subtitle">IP Whitespace Strategy Platform<br>Enter access code to continue</div>
+    <div class="gate-input-wrap">
+      <input type="password" class="gate-input" id="gateInput" placeholder="Access code" autocomplete="off" spellcheck="false">
+      <button class="gate-eye" id="gateEye" type="button" aria-label="Toggle visibility">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+    <button class="gate-btn" id="gateBtn">Unlock Platform</button>
+    <div class="gate-error" id="gateError"></div>
+    <div class="gate-footer">Confidential &middot; Authorized personnel only</div>
+  </div>
+</div>
+
+<div class="app locked" id="mainApp">
   <!-- ─── TOP BAR WITH 4-WAY TOGGLE ─── -->
   <div class="topbar">
     <div class="topbar-left">
@@ -386,6 +541,60 @@ iframe.visible {
 
 <!-- Chat Widget (loads from separate file) -->
 <script src="./chat-widget.js"></script>
+
+<!-- ─── PASSWORD GATE LOGIC ─── -->
+<script>
+(function() {
+  var KEY = [97,105,109,97,107,101,115,105,112]; // encoded
+  var gate = document.getElementById('gateOverlay');
+  var app = document.getElementById('mainApp');
+  var inp = document.getElementById('gateInput');
+  var btn = document.getElementById('gateBtn');
+  var err = document.getElementById('gateError');
+  var eye = document.getElementById('gateEye');
+
+  // Check session
+  if (sessionStorage.getItem('ipco_auth') === 'granted') {
+    gate.classList.add('dismissed');
+    app.classList.remove('locked');
+  } else {
+    inp.focus();
+  }
+
+  function verify() {
+    var val = inp.value.trim();
+    var match = val.length === KEY.length && val.split('').every(function(c, i) { return c.charCodeAt(0) === KEY[i]; });
+    if (match) {
+      sessionStorage.setItem('ipco_auth', 'granted');
+      gate.classList.add('dismissed');
+      app.classList.remove('locked');
+      err.textContent = '';
+    } else {
+      err.textContent = 'Invalid access code. Please try again.';
+      inp.classList.add('shake');
+      setTimeout(function() { inp.classList.remove('shake'); }, 500);
+      inp.value = '';
+      inp.focus();
+    }
+  }
+
+  btn.addEventListener('click', verify);
+  inp.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); verify(); }
+    err.textContent = '';
+  });
+
+  // Toggle password visibility
+  var visible = false;
+  eye.addEventListener('click', function() {
+    visible = !visible;
+    inp.type = visible ? 'text' : 'password';
+    eye.innerHTML = visible
+      ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+      : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+  });
+})();
+</script>
 
 <script>
 (function() {
