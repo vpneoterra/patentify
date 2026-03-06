@@ -1,0 +1,502 @@
+<!--
+   ______                            __
+  / ____/___  ____ ___  ____  __  __/ /____  _____
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                    /_/
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPCo — IP Whitespace Strategy Platform</title>
+<meta name="description" content="IPCo IP Whitespace Strategy — Interactive Dashboard, Investor Pitch, Patent Lab & AI Command Center">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root {
+  --font-display: 'DM Serif Display', serif;
+  --font-body: 'DM Sans', sans-serif;
+  --bg: #000000;
+  --bg-bar: #050505;
+  --border: rgba(148,163,184,0.10);
+  --text: #F1F5F9;
+  --text-muted: #94A3B8;
+  --text-faint: #64748B;
+  --accent: #2E8B7A;
+  --accent-blue: #2563EB;
+  --accent-amber: #D4A017;
+  --accent-violet: #8B5CF6;
+  --accent-rose: #F43F5E;
+  --glow: rgba(46,139,122,0.15);
+  --surface: #0A0A0A;
+}
+
+html, body { height: 100%; overflow: hidden; font-family: var(--font-body); background: var(--bg); color: var(--text); }
+
+/* ─── TOP BAR ─── */
+.topbar {
+  height: 52px;
+  background: var(--bg-bar);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  position: relative;
+  z-index: 1000;
+  flex-shrink: 0;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.logo svg { width: 28px; height: 28px; flex-shrink: 0; }
+.logo-text { font-family: var(--font-display); font-size: 17px; letter-spacing: -0.02em; }
+.logo-divider { width: 1px; height: 24px; background: var(--border); }
+
+/* ─── VIEW TOGGLE (4-way) ─── */
+.view-toggle {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  padding: 3px;
+  position: relative;
+  gap: 0;
+}
+
+.view-btn {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 24px;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+.view-btn svg {
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.view-btn.active {
+  color: var(--text);
+}
+.view-btn.active svg {
+  opacity: 1;
+}
+
+.view-btn:hover:not(.active) {
+  color: var(--text);
+}
+
+/* Sliding pill behind active button */
+.toggle-pill {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  height: calc(100% - 6px);
+  border-radius: 24px;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), width 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  pointer-events: none;
+}
+
+/* Pill color variants per view */
+.toggle-pill[data-view="dashboard"] {
+  background: linear-gradient(135deg, rgba(46,139,122,0.2) 0%, rgba(37,99,235,0.15) 100%);
+  border: 1px solid rgba(46,139,122,0.25);
+  box-shadow: 0 0 12px rgba(46,139,122,0.15), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.toggle-pill[data-view="investor"] {
+  background: linear-gradient(135deg, rgba(37,99,235,0.2) 0%, rgba(139,92,246,0.15) 100%);
+  border: 1px solid rgba(37,99,235,0.25);
+  box-shadow: 0 0 12px rgba(37,99,235,0.15), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.toggle-pill[data-view="patent-lab"] {
+  background: linear-gradient(135deg, rgba(212,160,23,0.2) 0%, rgba(234,179,8,0.15) 100%);
+  border: 1px solid rgba(212,160,23,0.25);
+  box-shadow: 0 0 12px rgba(212,160,23,0.15), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.toggle-pill[data-view="admin"] {
+  background: linear-gradient(135deg, rgba(139,92,246,0.2) 0%, rgba(244,63,94,0.12) 100%);
+  border: 1px solid rgba(139,92,246,0.25);
+  box-shadow: 0 0 12px rgba(139,92,246,0.15), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* ─── MODE INDICATOR DOTS ─── */
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.mode-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-faint);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.mode-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+}
+.mode-dot.dashboard {
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(46,139,122,0.4);
+}
+.mode-dot.investor {
+  background: var(--accent-blue);
+  box-shadow: 0 0 8px rgba(37,99,235,0.4);
+}
+.mode-dot.patent-lab {
+  background: var(--accent-amber);
+  box-shadow: 0 0 8px rgba(212,160,23,0.4);
+}
+.mode-dot.admin {
+  background: var(--accent-violet);
+  box-shadow: 0 0 8px rgba(139,92,246,0.4);
+}
+
+
+/* ─── FRAME CONTAINER ─── */
+.frame-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.frame-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+iframe.hidden {
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+iframe.visible {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 1;
+  transition: opacity 0.35s ease;
+}
+
+/* App layout */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+
+/* ─── KEYBOARD HINT ─── */
+.kbd-hint {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 10px;
+  font-family: var(--font-body);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* ─── IDEA COUNT BADGE ─── */
+.idea-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: rgba(212,160,23,0.15);
+  border: 1px solid rgba(212,160,23,0.3);
+  border-radius: 9px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-amber);
+  letter-spacing: 0;
+}
+
+/* ─── AI PULSE BADGE ─── */
+.ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 7px;
+  height: 18px;
+  background: rgba(139,92,246,0.12);
+  border: 1px solid rgba(139,92,246,0.25);
+  border-radius: 9px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent-violet);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.ai-badge .pulse {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-violet);
+  animation: ai-pulse 2s ease-in-out infinite;
+}
+@keyframes ai-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .topbar { padding: 0 10px; height: 48px; }
+  .logo-text { font-size: 15px; }
+  .logo-divider { display: none; }
+  .view-btn { padding: 5px 8px; font-size: 11px; gap: 4px; }
+  .view-btn span.label-text { display: none; }
+  .kbd-hint { display: none; }
+  .mode-badge { display: none; }
+  .idea-count { display: none; }
+  .ai-badge span.ai-label { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ─── TOP BAR WITH 4-WAY TOGGLE ─── -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <a class="logo" href="#">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="IPCo">
+          <rect x="2" y="2" width="28" height="28" rx="6" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+          <circle cx="10" cy="10" r="3" fill="currentColor" opacity="0.6"/>
+          <circle cx="22" cy="10" r="3" fill="currentColor" opacity="0.6"/>
+          <circle cx="10" cy="22" r="3" fill="currentColor" opacity="0.6"/>
+          <circle cx="22" cy="22" r="3" fill="currentColor" opacity="0.6"/>
+          <circle cx="16" cy="16" r="4" fill="currentColor"/>
+          <line x1="13" y1="13" x2="10" y2="10" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
+          <line x1="19" y1="13" x2="22" y2="10" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
+          <line x1="13" y1="19" x2="10" y2="22" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
+          <line x1="19" y1="19" x2="22" y2="22" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
+        </svg>
+        <span class="logo-text">IPCo</span>
+      </a>
+
+      <span class="logo-divider"></span>
+
+      <!-- ── 4-Way Toggle ── -->
+      <div class="view-toggle" id="viewToggle">
+        <div class="toggle-pill" id="togglePill" data-view="investor"></div>
+        <button class="view-btn active" id="btnInvestor" data-view="investor" aria-pressed="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          <span class="label-text">Business Plan</span>
+        </button>
+        <button class="view-btn" id="btnDashboard" data-view="dashboard" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span class="label-text">Strategy</span>
+        </button>
+        <button class="view-btn" id="btnPatentLab" data-view="patent-lab" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          <span class="label-text">Patent Lab</span>
+          <span class="idea-count">105</span>
+        </button>
+        <button class="view-btn" id="btnAdmin" data-view="admin" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v1a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 9a7 7 0 0 0-14 0"/><path d="M12 12v6"/><circle cx="12" cy="21" r="1"/><path d="M8 16h8"/></svg>
+          <span class="label-text">Command</span>
+          <span class="ai-badge"><span class="pulse"></span><span class="ai-label">AI</span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <div class="mode-badge">
+        <span class="mode-dot investor" id="modeDot"></span>
+        <span id="modeLabel">Business Plan</span>
+      </div>
+      <div class="kbd-hint">
+        <kbd class="kbd">Tab</kbd>
+        <span>to switch</span>
+      </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ─── CONTENT FRAMES ─── -->
+  <div class="frame-container">
+    <iframe id="frameInvestor" src="./investor/index.html" class="visible" title="IPCo Business Plan"></iframe>
+    <iframe id="frameDashboard" src="./dashboard/index.html" class="hidden" title="IP Strategy Dashboard"></iframe>
+    <iframe id="framePatentLab" src="./patent-lab/index.html" class="hidden" title="Patent Ideation Lab"></iframe>
+    <iframe id="frameAdmin" src="./admin/index.html" class="hidden" title="AI Command Center"></iframe>
+  </div>
+</div>
+
+<!-- Chat Widget (loads from separate file) -->
+<script src="./chat-widget.js"></script>
+
+<script>
+(function() {
+  const buttons = {
+    dashboard: document.getElementById('btnDashboard'),
+    investor: document.getElementById('btnInvestor'),
+    'patent-lab': document.getElementById('btnPatentLab'),
+    admin: document.getElementById('btnAdmin')
+  };
+  const frames = {
+    dashboard: document.getElementById('frameDashboard'),
+    investor: document.getElementById('frameInvestor'),
+    'patent-lab': document.getElementById('framePatentLab'),
+    admin: document.getElementById('frameAdmin')
+  };
+  const pill = document.getElementById('togglePill');
+  const modeDot = document.getElementById('modeDot');
+  const modeLabel = document.getElementById('modeLabel');
+  
+  const viewOrder = ['investor', 'dashboard', 'patent-lab', 'admin'];
+  const viewLabels = { dashboard: 'Strategy', investor: 'Business Plan', 'patent-lab': 'Patent Lab', admin: 'Command Center' };
+  let current = 'investor';
+
+  function measurePill() {
+    const active = buttons[current];
+    const parent = document.getElementById('viewToggle');
+    const pRect = parent.getBoundingClientRect();
+    const aRect = active.getBoundingClientRect();
+    pill.style.width = aRect.width + 'px';
+    pill.style.transform = 'translateX(' + (aRect.left - pRect.left - 3) + 'px)';
+    pill.setAttribute('data-view', current);
+  }
+
+  function switchView(view) {
+    if (view === current) return;
+    current = view;
+
+    Object.keys(buttons).forEach(function(key) {
+      buttons[key].classList.toggle('active', key === view);
+      buttons[key].setAttribute('aria-pressed', key === view);
+    });
+
+    Object.keys(frames).forEach(function(key) {
+      frames[key].className = key === view ? 'visible' : 'hidden';
+    });
+
+    modeDot.className = 'mode-dot ' + view;
+    modeLabel.textContent = viewLabels[view];
+
+    // Notify chat widget of view change
+    if (window.IPCoChat) {
+      window.IPCoChat.setView(view);
+    }
+
+    // When switching to investor, force-reveal all scroll-animated sections
+    if (view === 'investor') {
+      setTimeout(function() {
+        try {
+          frames.investor.contentWindow.postMessage('reveal-all', '*');
+        } catch(e) { /* cross-origin safety */ }
+      }, 100);
+      setTimeout(function() {
+        try {
+          frames.investor.contentWindow.postMessage('reveal-all', '*');
+          var iw = frames.investor.contentWindow;
+          iw.scrollBy(0, 1);
+          iw.scrollBy(0, -1);
+        } catch(e) {}
+      }, 400);
+    }
+
+    measurePill();
+  }
+
+  Object.keys(buttons).forEach(function(key) {
+    buttons[key].addEventListener('click', function() { switchView(key); });
+  });
+
+  // Keyboard shortcut: Tab key cycles through views
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Tab' && !e.target.closest('input, textarea, select')) {
+      e.preventDefault();
+      var idx = viewOrder.indexOf(current);
+      var next = viewOrder[(idx + 1) % viewOrder.length];
+      switchView(next);
+    }
+  });
+
+  // Initialize pill position after fonts load
+  requestAnimationFrame(function() {
+    measurePill();
+    setTimeout(measurePill, 100);
+    setTimeout(measurePill, 300);
+  });
+
+  window.addEventListener('resize', measurePill);
+
+  // Investor is default — trigger reveal-all once iframe loads
+  frames.investor.addEventListener('load', function() {
+    setTimeout(function() {
+      try {
+        frames.investor.contentWindow.postMessage('reveal-all', '*');
+      } catch(e) {}
+    }, 500);
+    setTimeout(function() {
+      try {
+        frames.investor.contentWindow.postMessage('reveal-all', '*');
+      } catch(e) {}
+    }, 1500);
+  });
+})();
+</script>
+</body>
+</html>

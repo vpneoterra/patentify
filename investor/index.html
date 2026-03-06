@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!--
+   ______                            __
+  / ____/___  ____ ___  ____  __  __/ /____  _____
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                    /_/
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPCo — IP Whitespace Capture & Licensing Venture</title>
+<meta name="description" content="IPCo is building foundational patent positions across 15 under-patented technology convergence zones. $26M investment. $772M NPV. 78% IRR.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/index-rg4UyP6M.css">
+</head>
+<body>
+<div id="root"></div>
+<script src="./assets/index-C2hK6hNw.js"></script>
+<script>
+// Fix: When embedded in an iframe, ensure reveal animations fire properly.
+// Listen for visibility signal from the parent frame.
+window.addEventListener('message', function(e) {
+  if (e.data === 'reveal-all') {
+    document.querySelectorAll('.reveal').forEach(function(el) {
+      el.classList.add('visible');
+    });
+  }
+});
+
+// Robust iframe-aware reveal: handle both visible-start and hidden-start cases
+(function() {
+  var maxChecks = 40;
+  var checkCount = 0;
+  function tryReveal() {
+    var unrevealed = document.querySelectorAll('.reveal:not(.visible)');
+    if (unrevealed.length > 0) {
+      // Force IntersectionObserver triggers via scroll nudge
+      window.scrollBy(0, 1);
+      window.scrollBy(0, -1);
+      // If still unrevealed after nudge, force visibility
+      setTimeout(function() {
+        document.querySelectorAll('.reveal:not(.visible)').forEach(function(el) {
+          el.classList.add('visible');
+        });
+      }, 200);
+    }
+    checkCount++;
+    if (checkCount < maxChecks && unrevealed.length > 0) {
+      setTimeout(tryReveal, 500);
+    }
+  }
+  // Start checking after React has time to mount and render
+  setTimeout(tryReveal, 800);
+  // Also try on load event
+  window.addEventListener('load', function() {
+    setTimeout(tryReveal, 300);
+  });
+})();
+</script>
+</body>
+</html>

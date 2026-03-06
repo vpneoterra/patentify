@@ -1,0 +1,2209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+   ______                            __
+  / ____/___  ____ ___  ____  __  __/ /____  _____
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                    /_/
+-->
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPCo Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+/* ============================================
+   CSS VARIABLES — IPCo Design Tokens
+   ============================================ */
+:root {
+  --bg-primary: #000000;
+  --bg-surface: #0A0A0A;
+  --bg-card: #141414;
+  --bg-hover: #1A1A1A;
+  --bg-sidebar: #050505;
+  --border: rgba(148,163,184,0.10);
+  --border-strong: rgba(148,163,184,0.20);
+  --text: #F1F5F9;
+  --text-muted: #94A3B8;
+  --text-faint: #64748B;
+  --accent: #2E8B7A;
+  --accent-blue: #2563EB;
+  --accent-amber: #D4A017;
+  --accent-violet: #8B5CF6;
+  --accent-red: #EF4444;
+  --accent-green: #22C55E;
+  --font-body: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-heading: 'DM Serif Display', Georgia, serif;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --sidebar-width: 240px;
+  --sidebar-collapsed: 60px;
+  --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* ============================================
+   LAYOUT — Dashboard Grid
+   ============================================ */
+.dashboard {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: 1fr;
+  height: 100dvh;
+  transition: grid-template-columns var(--transition);
+}
+.dashboard.collapsed {
+  grid-template-columns: var(--sidebar-collapsed) 1fr;
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+  grid-row: 1 / -1;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  transition: all var(--transition);
+  z-index: 20;
+}
+.sidebar-header {
+  padding: 20px 16px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  min-height: 68px;
+}
+.sidebar-logo {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+}
+.sidebar-brand {
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity var(--transition), width var(--transition);
+}
+.dashboard.collapsed .sidebar-brand { opacity: 0; width: 0; }
+.sidebar-brand h1 {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.sidebar-brand span {
+  font-size: 10px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all var(--transition);
+  border: none;
+  background: none;
+  font: inherit;
+  width: 100%;
+  text-align: left;
+  border-left: 3px solid transparent;
+  position: relative;
+}
+.nav-item:hover { background: var(--bg-hover); color: var(--text); }
+.nav-item.active {
+  border-left-color: var(--accent);
+  color: var(--accent);
+  background: rgba(46,139,122,0.08);
+}
+.nav-item svg { flex-shrink: 0; width: 20px; height: 20px; }
+.nav-item-label {
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity var(--transition), width var(--transition);
+  font-size: 13px;
+  font-weight: 500;
+}
+.dashboard.collapsed .nav-item-label { opacity: 0; width: 0; }
+
+.sidebar-footer {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sidebar-footer-text {
+  font-size: 10px;
+  color: var(--text-faint);
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity var(--transition);
+}
+.dashboard.collapsed .sidebar-footer-text { opacity: 0; width: 0; }
+.collapse-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-faint);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+.collapse-btn:hover { color: var(--text); border-color: var(--border-strong); }
+.dashboard.collapsed .collapse-btn svg { transform: rotate(180deg); }
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.main {
+  grid-column: 2;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--bg-primary);
+}
+.main-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.main-header h2 {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  color: var(--text);
+}
+.main-header-actions { display: flex; gap: 8px; align-items: center; }
+.health-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--accent-green);
+}
+.health-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  animation: pulse-green 2s infinite;
+}
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+}
+
+.content { padding: 24px 32px 32px; }
+
+/* Tab panels */
+.tab-panel { display: none; animation: fadeIn 300ms ease; }
+.tab-panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ============================================
+   SHARED COMPONENTS
+   ============================================ */
+
+/* KPI Cards */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color var(--transition);
+}
+.kpi-card:hover { border-color: var(--border-strong); }
+.kpi-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.kpi-icon svg { width: 18px; height: 18px; }
+.kpi-value {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.kpi-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Skeleton loader */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-hover) 50%, var(--bg-card) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.skeleton-text { height: 14px; width: 60%; margin: 4px 0; }
+.skeleton-title { height: 28px; width: 40%; margin: 4px 0; }
+.skeleton-block { height: 80px; width: 100%; }
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1.6;
+}
+.badge-teal { background: rgba(46,139,122,0.15); color: var(--accent); }
+.badge-blue { background: rgba(37,99,235,0.15); color: var(--accent-blue); }
+.badge-violet { background: rgba(139,92,246,0.15); color: var(--accent-violet); }
+.badge-amber { background: rgba(212,160,23,0.15); color: var(--accent-amber); }
+.badge-red { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+.badge-green { background: rgba(34,197,94,0.15); color: var(--accent-green); }
+.badge-muted { background: rgba(100,116,139,0.15); color: var(--text-faint); }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all var(--transition);
+  font-family: var(--font-body);
+  line-height: 1.4;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.btn-primary:hover { background: #257568; }
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+.btn-secondary:hover { background: var(--bg-hover); }
+.btn-danger {
+  background: rgba(239,68,68,0.1);
+  color: var(--accent-red);
+  border-color: rgba(239,68,68,0.2);
+}
+.btn-danger:hover { background: rgba(239,68,68,0.2); }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+.btn-icon {
+  padding: 6px;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+}
+.btn-icon:hover { color: var(--text); border-color: var(--border-strong); }
+
+/* Form elements */
+.form-group { margin-bottom: 20px; }
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 14px;
+  font-family: var(--font-body);
+  transition: border-color var(--transition);
+  outline: none;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--accent);
+}
+.form-textarea { resize: vertical; line-height: 1.6; }
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394A3B8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+.form-select option { background: var(--bg-card); color: var(--text); }
+
+/* Range slider */
+.range-group { display: flex; align-items: center; gap: 12px; }
+.range-value {
+  min-width: 36px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+}
+input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: var(--bg-hover);
+  border-radius: 2px;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: 2px solid var(--bg-primary);
+}
+
+/* Toggle switch */
+.toggle-wrap { display: flex; align-items: center; gap: 10px; }
+.toggle {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  cursor: pointer;
+}
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-hover);
+  border-radius: 11px;
+  border: 1px solid var(--border);
+  transition: background var(--transition);
+}
+.toggle input:checked + .toggle-track { background: var(--accent); border-color: var(--accent); }
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform var(--transition);
+  pointer-events: none;
+}
+.toggle input:checked ~ .toggle-thumb { transform: translateX(18px); }
+.toggle-label { font-size: 13px; color: var(--text-muted); }
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  transition: border-color var(--transition);
+}
+.card:hover { border-color: var(--border-strong); }
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Activity list */
+.activity-list { display: flex; flex-direction: column; gap: 1px; }
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition);
+}
+.activity-item:hover { background: var(--bg-hover); }
+.activity-time {
+  font-size: 11px;
+  color: var(--text-faint);
+  min-width: 72px;
+  text-align: right;
+}
+.activity-title {
+  font-size: 13px;
+  color: var(--text);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Section titles */
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+/* Filter bar */
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.filter-bar .form-input, .filter-bar .form-select {
+  width: auto;
+  min-width: 160px;
+}
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  max-width: 400px;
+}
+
+/* Scrollable table */
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+thead { position: sticky; top: 0; z-index: 1; }
+th {
+  background: var(--bg-card);
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border);
+}
+td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+.td-truncate {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Memory stats bar */
+.stats-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  align-items: center;
+}
+.stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.stat-pill strong { color: var(--text); }
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fadeIn 200ms ease;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  width: 90%;
+  max-width: 560px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.modal-title {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+/* Toast notifications */
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.toast {
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  min-width: 260px;
+  max-width: 400px;
+  animation: slideIn 300ms ease, fadeOut 300ms ease 3.7s forwards;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.toast-success { background: var(--accent); }
+.toast-error { background: var(--accent-red); }
+.toast-info { background: var(--accent-blue); }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes fadeOut { to { opacity: 0; transform: translateY(8px); } }
+
+/* Invention grid */
+.invention-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 16px;
+}
+.invention-card { cursor: pointer; }
+.invention-score {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+}
+.score-high { color: var(--accent-green); }
+.score-mid { color: var(--accent-amber); }
+.score-low { color: var(--accent-red); }
+.invention-details {
+  display: none;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.invention-card.expanded .invention-details { display: block; }
+
+/* Workflow cards */
+.workflow-grid { display: flex; flex-direction: column; gap: 12px; }
+.workflow-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.workflow-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.workflow-editor {
+  display: none;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.workflow-card.editing .workflow-editor { display: block; }
+.workflow-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+/* Run history */
+.run-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+}
+.badge-running {
+  background: rgba(37,99,235,0.15);
+  color: var(--accent-blue);
+  animation: pulse-badge 1.5s infinite;
+}
+@keyframes pulse-badge { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+/* Empty states */
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-faint);
+}
+.empty-state svg { margin-bottom: 12px; opacity: 0.4; }
+.empty-state p { font-size: 14px; }
+
+/* Footer */
+.page-footer {
+  padding: 24px 32px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.page-footer a {
+  font-size: 11px;
+  color: var(--text-faint);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+.page-footer a:hover { color: var(--text-muted); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard { grid-template-columns: var(--sidebar-collapsed) 1fr; }
+  .nav-item-label, .sidebar-brand, .sidebar-footer-text { opacity: 0; width: 0; }
+  .main-header { padding: 12px 16px; }
+  .content { padding: 16px; }
+  .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+  .invention-grid { grid-template-columns: 1fr; }
+}
+
+/* Pipeline steps visualization */
+.pipeline-steps { display: flex; align-items: flex-start; gap: 4px; overflow-x: auto; padding-bottom: 8px; }
+.pipeline-step {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg-hover); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 8px 10px; min-width: 130px; flex-shrink: 0;
+}
+.pipeline-num {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--accent); color: #fff;
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.pipeline-info { min-width: 0; }
+.pipeline-label { font-size: 11px; font-weight: 600; color: var(--text); white-space: nowrap; }
+.pipeline-model { font-size: 10px; color: var(--text-faint); white-space: nowrap; }
+.pipeline-arrow { display: flex; align-items: center; flex-shrink: 0; }
+.collateral-item {
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md);
+  margin-bottom: 8px; transition: border-color var(--transition);
+}
+.collateral-item:hover { border-color: var(--border-strong); }
+.collateral-icon {
+  width: 36px; height: 36px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.collateral-icon.docx { background: rgba(37,99,235,0.12); color: var(--accent-blue); }
+.collateral-icon.png { background: rgba(34,197,94,0.12); color: var(--accent-green); }
+.collateral-icon.zip { background: rgba(212,160,23,0.12); color: var(--accent-amber); }
+.collateral-icon.pdf { background: rgba(239,68,68,0.12); color: var(--accent-red); }
+.btn-pipeline {
+  display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px;
+  background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.25);
+  border-radius: 6px; color: var(--accent-violet); font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: all var(--transition); font-family: var(--font-body);
+}
+.btn-pipeline:hover { background: rgba(139,92,246,0.22); }
+</style>
+</head>
+<body>
+
+<div class="dashboard" id="dashboard">
+  <!-- ============================================
+       SIDEBAR
+       ============================================ -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <svg class="sidebar-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="IPCo Logo">
+        <path d="M16 2L28.66 9.5V24.5L16 32L3.34 24.5V9.5L16 2Z" stroke="var(--accent)" stroke-width="1.5" fill="none"/>
+        <path d="M16 6L25.32 11.5V22.5L16 28L6.68 22.5V11.5L16 6Z" stroke="var(--accent)" stroke-width="0.75" fill="none" opacity="0.4"/>
+        <text x="16" y="19" text-anchor="middle" fill="var(--accent)" font-family="var(--font-body)" font-size="8" font-weight="700">IPCo</text>
+      </svg>
+      <div class="sidebar-brand">
+        <h1>IPCo</h1>
+        <span>Command Center</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-tab="overview" onclick="switchTab('overview')">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg>
+        <span class="nav-item-label">Overview</span>
+      </button>
+      <button class="nav-item" data-tab="settings" onclick="switchTab('settings')">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="3"/><path d="M10 1.5v2M10 16.5v2M1.5 10h2M16.5 10h2M3.4 3.4l1.4 1.4M15.2 15.2l1.4 1.4M3.4 16.6l1.4-1.4M15.2 4.8l1.4-1.4"/></svg>
+        <span class="nav-item-label">Agent Settings</span>
+      </button>
+      <button class="nav-item" data-tab="workflows" onclick="switchTab('workflows')">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h4v4H4zM12 4h4v4h-4zM8 12h4v4H8z"/><path d="M6 8v2h2M14 8v4h-2"/></svg>
+        <span class="nav-item-label">Workflows</span>
+      </button>
+      <button class="nav-item" data-tab="memory" onclick="switchTab('memory')">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V4z"/><path d="M7 3v14M3 8h14M3 13h14"/></svg>
+        <span class="nav-item-label">Memory</span>
+      </button>
+      <button class="nav-item" data-tab="inventions" onclick="switchTab('inventions')">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2a5 5 0 015 5c0 2.2-1.4 4-3.5 4.7V14h-3v-2.3C6.4 11 5 9.2 5 7a5 5 0 015-5z"/><path d="M8 15h4M8.5 17h3"/></svg>
+        <span class="nav-item-label">Inventions</span>
+      </button>
+      <button class="nav-item" data-tab="collaterals" onclick="switchTab('collaterals')">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h5l2 2h5v10H4V4z"/><path d="M8 12h4M8 14h2"/></svg>
+        <span class="nav-item-label">Collaterals</span>
+      </button>
+      <button class="nav-item" data-tab="activity" onclick="switchTab('activity')">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v14h14"/><path d="M6 13l3-4 3 2 4-5"/></svg>
+        <span class="nav-item-label">Activity Log</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="sidebar-footer-text">Command Center v1.0</span>
+      <button class="collapse-btn" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ============================================
+       MAIN CONTENT
+       ============================================ -->
+  <main class="main">
+    <div class="main-header">
+      <h2 id="page-title">Overview</h2>
+      <div class="main-header-actions">
+        <div class="health-indicator">
+          <span class="health-dot"></span>
+          Operational
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- ==================
+           TAB 1: OVERVIEW
+           ================== -->
+      <div class="tab-panel active" id="panel-overview">
+        <div class="kpi-grid" id="kpi-grid">
+          <div class="kpi-card"><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-text"></div></div>
+          <div class="kpi-card"><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-text"></div></div>
+          <div class="kpi-card"><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-text"></div></div>
+          <div class="kpi-card"><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-text"></div></div>
+          <div class="kpi-card"><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-text"></div></div>
+          <div class="kpi-card"><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-text"></div></div>
+        </div>
+        <h3 class="section-title">Recent Activity</h3>
+        <div class="activity-list" id="recent-activity">
+          <div class="activity-item"><div class="skeleton skeleton-text" style="width:100%"></div></div>
+          <div class="activity-item"><div class="skeleton skeleton-text" style="width:100%"></div></div>
+          <div class="activity-item"><div class="skeleton skeleton-text" style="width:100%"></div></div>
+        </div>
+      </div>
+
+      <!-- ==================
+           TAB 2: AGENT SETTINGS
+           ================== -->
+      <div class="tab-panel" id="panel-settings">
+        <form id="settings-form" onsubmit="saveSettings(event)">
+          <div class="form-group">
+            <label class="form-label">Personality Name</label>
+            <input type="text" class="form-input" id="cfg-personality" value="IPCo IP Strategist">
+          </div>
+          <div class="form-group">
+            <label class="form-label">System Prompt</label>
+            <textarea class="form-textarea" id="cfg-system-prompt" rows="12" placeholder="Core identity prompt..."></textarea>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <div class="form-group">
+              <label class="form-label">Model</label>
+              <select class="form-select" id="cfg-model">
+                <option value="claude_opus_4_6">Claude Opus 4.6</option>
+                <option value="claude_sonnet_4_6">Claude Sonnet 4.6</option>
+                <option value="claude_haiku_4_5">Claude Haiku 4.5</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Response Style</label>
+              <select class="form-select" id="cfg-style">
+                <option value="professional">Professional</option>
+                <option value="technical">Technical</option>
+                <option value="concise">Concise</option>
+                <option value="detailed">Detailed</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Temperature</label>
+            <div class="range-group">
+              <input type="range" id="cfg-temperature" min="0" max="1" step="0.05" value="0.3" oninput="document.getElementById('temp-val').textContent=this.value">
+              <span class="range-value" id="temp-val">0.3</span>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <div class="form-group">
+              <label class="form-label">Max Tokens</label>
+              <input type="number" class="form-input" id="cfg-max-tokens" value="4096" min="256" max="32768">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Domain Focus</label>
+              <select class="form-select" id="cfg-domain">
+                <option value="all">All Domains</option>
+                <option value="materials">Materials</option>
+                <option value="semiconductor">Semiconductor</option>
+                <option value="biotech">Biotech</option>
+                <option value="autonomous">Autonomous</option>
+                <option value="energy">Energy</option>
+                <option value="quantum">Quantum</option>
+                <option value="manufacturing">Manufacturing</option>
+                <option value="edge_computing">Edge Computing</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <div class="form-group">
+              <label class="form-label">Scoring Threshold</label>
+              <input type="number" class="form-input" id="cfg-scoring-threshold" value="7.0" min="0" max="10" step="0.1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">FTO Reject Level</label>
+              <select class="form-select" id="cfg-fto-reject">
+                <option value="red">Red</option>
+                <option value="high">High</option>
+                <option value="moderate">Moderate</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Auto-Research</label>
+            <div class="toggle-wrap">
+              <label class="toggle">
+                <input type="checkbox" id="cfg-auto-research" checked>
+                <span class="toggle-track"></span>
+                <span class="toggle-thumb"></span>
+              </label>
+              <span class="toggle-label" id="auto-research-label">Enabled</span>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top:8px;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 5L6.5 11.5 3 8"/></svg>
+            Save Configuration
+          </button>
+        </form>
+      </div>
+
+      <!-- ==================
+           TAB 3: WORKFLOWS
+           ================== -->
+      <div class="tab-panel" id="panel-workflows">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <h3 class="section-title" style="margin-bottom:0;">Workflow Definitions</h3>
+          <button class="btn btn-primary" onclick="openCreateWorkflow()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 1v12M1 7h12"/></svg>
+            Create Workflow
+          </button>
+        </div>
+        <div class="workflow-grid" id="workflow-list">
+          <div class="card"><div class="skeleton skeleton-block"></div></div>
+        </div>
+        <h3 class="section-title" style="margin-top:32px;">Run History</h3>
+        <div id="run-history" class="activity-list">
+          <div class="activity-item"><div class="skeleton skeleton-text" style="width:100%"></div></div>
+        </div>
+      </div>
+
+      <!-- ==================
+           TAB 4: MEMORY
+           ================== -->
+      <div class="tab-panel" id="panel-memory">
+        <div class="filter-bar">
+          <input type="text" class="form-input search-input" id="memory-search" placeholder="Search memories..." oninput="loadMemory()">
+          <select class="form-select" id="memory-category-filter" onchange="loadMemory()">
+            <option value="">All Categories</option>
+            <option value="landscape_scan">Landscape Scan</option>
+            <option value="invention">Invention</option>
+            <option value="prior_art">Prior Art</option>
+            <option value="competitor">Competitor</option>
+            <option value="fto_analysis">FTO Analysis</option>
+            <option value="alert">Alert</option>
+          </select>
+          <button class="btn btn-primary" onclick="openAddMemory()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 1v12M1 7h12"/></svg>
+            Add Memory
+          </button>
+        </div>
+        <div class="stats-bar" id="memory-stats"></div>
+        <div class="activity-list" id="memory-list">
+          <div class="activity-item"><div class="skeleton skeleton-text" style="width:100%"></div></div>
+        </div>
+      </div>
+
+      <!-- ==================
+           TAB 5: INVENTIONS
+           ================== -->
+      <div class="tab-panel" id="panel-inventions">
+        <div class="filter-bar">
+          <select class="form-select" id="inv-status-filter" onchange="loadInventions()">
+            <option value="">All Statuses</option>
+            <option value="hypothesis">Hypothesis</option>
+            <option value="approved">Approved</option>
+            <option value="filed">Filed</option>
+            <option value="granted">Granted</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          <select class="form-select" id="inv-whitespace-filter" onchange="loadInventions()">
+            <option value="">All Whitespaces</option>
+          </select>
+        </div>
+        <div class="invention-grid" id="invention-list">
+          <div class="card"><div class="skeleton skeleton-block"></div></div>
+        </div>
+      </div>
+
+      <!-- ==================
+           TAB 5b: COLLATERALS
+           ================== -->
+      <div class="tab-panel" id="panel-collaterals">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <h3 class="section-title" style="margin-bottom:0;">Patent Pipeline Collaterals</h3>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select class="form-select" id="coll-invention-filter" onchange="loadCollaterals()" style="min-width:200px;">
+              <option value="">All Inventions</option>
+            </select>
+            <select class="form-select" id="coll-type-filter" onchange="loadCollaterals()">
+              <option value="">All Types</option>
+              <option value="fto_analysis">FTO & Patentability Analysis</option>
+              <option value="patent_filing">Patent Filing (DOCX)</option>
+              <option value="mindmap">Claim Architecture Mindmap</option>
+              <option value="figures">USPTO Figures</option>
+              <option value="figures_appendix">Figures Appendix</option>
+              <option value="strengthening">Strengthening Recommendations</option>
+              <option value="strategy">Patenting Strategy</option>
+              <option value="bundle">Complete Patent Bundle (ZIP)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Storage path indicator -->
+        <div class="card" style="padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;border-left:3px solid var(--accent);">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="var(--accent)" stroke-width="1.5"><path d="M4 4h5l2 2h5v10H4V4z"/></svg>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:12px;font-weight:600;color:var(--text);">Collateral Storage Path</div>
+            <div style="font-size:11px;color:var(--text-faint);font-family:monospace;">/data/collaterals/{invention_id}/{run_timestamp}/</div>
+          </div>
+          <span class="badge badge-teal">Workflow 1 Output</span>
+        </div>
+
+        <!-- Reference documents -->
+        <div class="card" style="padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;border-left:3px solid var(--accent-violet);">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="var(--accent-violet)" stroke-width="1.5"><path d="M6 2h8l4 4v12H6V2z"/><path d="M14 2v4h4"/><path d="M8 10h4M8 13h6"/></svg>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:12px;font-weight:600;color:var(--text);">Workflow 1 Reference Documents</div>
+            <div style="font-size:11px;color:var(--text-faint);">Patent_generation_prompt_V2.docx &middot; USPTO_Patent_Drafting_Guidelines.docx &middot; USPTO_Patent_Figures_Guide.docx</div>
+          </div>
+          <span class="badge badge-violet">3 files</span>
+        </div>
+
+        <!-- Pipeline steps visual -->
+        <div class="card" style="padding:18px;margin-bottom:20px;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:var(--text);">Workflow 1 &mdash; Patent Generation Pipeline (8 Steps)</div>
+          <div class="pipeline-steps">
+            <div class="pipeline-step">
+              <div class="pipeline-num">1</div>
+              <div class="pipeline-info">
+                <div class="pipeline-label">FTO & Patentability Analysis</div>
+                <div class="pipeline-model">Claude Sonnet &middot; Deep Research</div>
+              </div>
+            </div>
+            <div class="pipeline-arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--text-faint)" stroke-width="1.5"><path d="M3 8h10M10 5l3 3-3 3"/></svg></div>
+            <div class="pipeline-step">
+              <div class="pipeline-num">2</div>
+              <div class="pipeline-info">
+                <div class="pipeline-label">Patent Construction Prompt</div>
+                <div class="pipeline-model">Claude Opus &middot; Extended Thinking</div>
+              </div>
+            </div>
+            <div class="pipeline-arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--text-faint)" stroke-width="1.5"><path d="M3 8h10M10 5l3 3-3 3"/></svg></div>
+            <div class="pipeline-step">
+              <div class="pipeline-num">3</div>
+              <div class="pipeline-info">
+                <div class="pipeline-label">Patent Document (DOCX)</div>
+                <div class="pipeline-model">Claude Opus &middot; python-docx</div>
+              </div>
+            </div>
+            <div class="pipeline-arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--text-faint)" stroke-width="1.5"><path d="M3 8h10M10 5l3 3-3 3"/></svg></div>
+            <div class="pipeline-step">
+              <div class="pipeline-num">4</div>
+              <div class="pipeline-info">
+                <div class="pipeline-label">Cover Sheet & Mindmap</div>
+                <div class="pipeline-model">Claude Opus &middot; PNG generation</div>
+              </div>
+            </div>
+            <div class="pipeline-arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--text-faint)" stroke-width="1.5"><path d="M3 8h10M10 5l3 3-3 3"/></svg></div>
+            <div class="pipeline-step">
+              <div class="pipeline-num">5</div>
+              <div class="pipeline-info">
+                <div class="pipeline-label">USPTO Figures</div>
+                <div class="pipeline-model">Claude Opus &middot; matplotlib</div>
+              </div>
+            </div>
+            <div class="pipeline-arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--text-faint)" stroke-width="1.5"><path d="M3 8h10M10 5l3 3-3 3"/></svg></div>
+            <div class="pipeline-step">
+              <div class="pipeline-num">6</div>
+              <div class="pipeline-info">
+                <div class="pipeline-label">Strengthening Recs</div>
+                <div class="pipeline-model">Claude Sonnet &middot; Deep Research</div>
+              </div>
+            </div>
+            <div class="pipeline-arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--text-faint)" stroke-width="1.5"><path d="M3 8h10M10 5l3 3-3 3"/></svg></div>
+            <div class="pipeline-step">
+              <div class="pipeline-num">7</div>
+              <div class="pipeline-info">
+                <div class="pipeline-label">Integrity Audit</div>
+                <div class="pipeline-model">Cross-document validation</div>
+              </div>
+            </div>
+            <div class="pipeline-arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--text-faint)" stroke-width="1.5"><path d="M3 8h10M10 5l3 3-3 3"/></svg></div>
+            <div class="pipeline-step">
+              <div class="pipeline-num">8</div>
+              <div class="pipeline-info">
+                <div class="pipeline-label">Bundle & ZIP</div>
+                <div class="pipeline-model">5 deliverables packaged</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Collaterals list -->
+        <div class="activity-list" id="collateral-list">
+          <div class="empty-state">
+            <svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><path d="M4 4h5l2 2h5v10H4V4z"/></svg>
+            <p>No collaterals generated yet. Run the Patent Pipeline on an invention to generate output.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================
+           TAB 6: ACTIVITY LOG
+           ================== -->
+      <div class="tab-panel" id="panel-activity">
+        <div class="filter-bar">
+          <select class="form-select" id="activity-type-filter" onchange="loadActivity()">
+            <option value="">All Event Types</option>
+          </select>
+          <span style="font-size:11px;color:var(--text-faint);">Auto-refreshes every 30s</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Event Type</th>
+                <th>Category</th>
+                <th>Title</th>
+                <th>Detail</th>
+              </tr>
+            </thead>
+            <tbody id="activity-table-body">
+              <tr><td colspan="5"><div class="skeleton skeleton-text" style="width:100%"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <footer class="page-footer">
+    </footer>
+  </main>
+</div>
+
+<!-- ============================================
+     MODALS
+     ============================================ -->
+
+<!-- Add Memory Modal -->
+<div class="modal-overlay" id="modal-add-memory">
+  <div class="modal">
+    <h3 class="modal-title">Add Memory Entry</h3>
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <select class="form-select" id="mem-category">
+        <option value="landscape_scan">Landscape Scan</option>
+        <option value="invention">Invention</option>
+        <option value="prior_art">Prior Art</option>
+        <option value="competitor">Competitor</option>
+        <option value="fto_analysis">FTO Analysis</option>
+        <option value="alert">Alert</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Title</label>
+      <input type="text" class="form-input" id="mem-title">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Content</label>
+      <textarea class="form-textarea" id="mem-content" rows="6"></textarea>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div class="form-group">
+        <label class="form-label">Whitespace ID</label>
+        <input type="number" class="form-input" id="mem-whitespace" min="1" max="15" value="1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Relevance Score</label>
+        <div class="range-group">
+          <input type="range" id="mem-relevance" min="0" max="1" step="0.05" value="0.8" oninput="document.getElementById('rel-val').textContent=this.value">
+          <span class="range-value" id="rel-val">0.8</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-add-memory')">Cancel</button>
+      <button class="btn btn-primary" onclick="addMemory()">Add Memory</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create Workflow Modal -->
+<div class="modal-overlay" id="modal-create-workflow">
+  <div class="modal" style="max-width:640px;">
+    <h3 class="modal-title">Create Workflow</h3>
+    <div class="form-group">
+      <label class="form-label">Name</label>
+      <input type="text" class="form-input" id="wf-name" placeholder="e.g., Daily Patent Scan">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-textarea" id="wf-description" rows="3" placeholder="What this workflow does..."></textarea>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <select class="form-select" id="wf-type">
+          <option value="landscape_scan">Landscape Scan</option>
+          <option value="invention_generation">Invention Generation</option>
+          <option value="patent_generation">Patent Generation Pipeline</option>
+          <option value="filing_preparation">Filing Preparation</option>
+          <option value="monitoring">Monitoring</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Schedule (Cron)</label>
+        <input type="text" class="form-input" id="wf-schedule" placeholder="0 8 * * *">
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div class="form-group">
+        <label class="form-label">Cost Cap ($)</label>
+        <input type="number" class="form-input" id="wf-cost-cap" value="5.00" step="0.50" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Human Gate</label>
+        <div class="toggle-wrap" style="margin-top:8px;">
+          <label class="toggle">
+            <input type="checkbox" id="wf-human-gate">
+            <span class="toggle-track"></span>
+            <span class="toggle-thumb"></span>
+          </label>
+          <span class="toggle-label">Require approval</span>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Steps (JSON)</label>
+      <textarea class="form-textarea" id="wf-steps" rows="6" placeholder='[{"action": "search", "params": {}}]'></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-create-workflow')">Cancel</button>
+      <button class="btn btn-primary" onclick="createWorkflow()">Create Workflow</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+/* ============================================
+   CONSTANTS & STATE
+   ============================================ */
+const API = "port/8000";
+const numFmt = new Intl.NumberFormat();
+let currentTab = 'overview';
+let activityRefreshTimer = null;
+
+/* ============================================
+   UTILITY FUNCTIONS
+   ============================================ */
+function relativeTime(dateStr) {
+  if (!dateStr) return '';
+  const now = new Date();
+  const d = new Date(dateStr);
+  const diff = Math.floor((now - d) / 1000);
+  if (diff < 5) return 'just now';
+  if (diff < 60) return diff + 's ago';
+  if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+  if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+  return d.toLocaleDateString();
+}
+
+function toast(message, type) {
+  type = type || 'info';
+  var container = document.getElementById('toast-container');
+  var el = document.createElement('div');
+  el.className = 'toast toast-' + type;
+  el.textContent = message;
+  container.appendChild(el);
+  setTimeout(function() { el.remove(); }, 4000);
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function cronToHuman(cron) {
+  if (!cron) return 'Manual';
+  var parts = cron.split(' ');
+  if (parts.length < 5) return cron;
+  var min = parts[0], hour = parts[1], dom = parts[2], mon = parts[3], dow = parts[4];
+  if (dom === '*' && mon === '*' && dow === '*') {
+    if (hour === '*') return 'Every minute';
+    return 'Daily at ' + hour + ':' + (min === '0' ? '00' : min);
+  }
+  if (dow !== '*' && dom === '*') {
+    var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    var dayNames = dow.split(',').map(function(d) { return days[parseInt(d)] || d; }).join(', ');
+    return dayNames + ' at ' + hour + ':' + (min === '0' ? '00' : min);
+  }
+  return cron;
+}
+
+function typeBadgeClass(type) {
+  var map = {
+    'landscape_scan': 'badge-teal',
+    'invention_generation': 'badge-blue',
+    'filing_preparation': 'badge-violet',
+    'patent_generation': 'badge-violet',
+    'monitoring': 'badge-amber'
+  };
+  return map[type] || 'badge-muted';
+}
+
+function statusBadgeClass(status) {
+  var map = {
+    'running': 'badge-running',
+    'completed': 'badge-green',
+    'failed': 'badge-red',
+    'paused': 'badge-amber',
+    'hypothesis': 'badge-blue',
+    'approved': 'badge-green',
+    'filed': 'badge-violet',
+    'granted': 'badge-teal',
+    'rejected': 'badge-red'
+  };
+  return map[status] || 'badge-muted';
+}
+
+function categoryBadgeClass(cat) {
+  var map = {
+    'landscape_scan': 'badge-teal',
+    'invention': 'badge-blue',
+    'prior_art': 'badge-violet',
+    'competitor': 'badge-amber',
+    'fto_analysis': 'badge-red',
+    'alert': 'badge-amber'
+  };
+  return map[cat] || 'badge-muted';
+}
+
+function scoreClass(score) {
+  if (score >= 8.5) return 'score-high';
+  if (score >= 7) return 'score-mid';
+  return 'score-low';
+}
+
+async function apiFetch(path, options) {
+  try {
+    var resp = await fetch(API + path, options);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    return await resp.json();
+  } catch (e) {
+    toast('API Error: ' + e.message, 'error');
+    throw e;
+  }
+}
+
+/* ============================================
+   NAVIGATION
+   ============================================ */
+var tabTitles = {
+  'overview': 'Overview',
+  'settings': 'Agent Settings',
+  'workflows': 'Workflows',
+  'memory': 'Memory / Knowledge Base',
+  'inventions': 'Inventions',
+  'collaterals': 'Patent Collaterals',
+  'activity': 'Activity Log'
+};
+
+function switchTab(tab) {
+  currentTab = tab;
+  /* Update nav */
+  document.querySelectorAll('.nav-item').forEach(function(el) {
+    el.classList.toggle('active', el.dataset.tab === tab);
+  });
+  /* Update panels */
+  document.querySelectorAll('.tab-panel').forEach(function(el) {
+    el.classList.toggle('active', el.id === 'panel-' + tab);
+  });
+  /* Update title */
+  document.getElementById('page-title').textContent = tabTitles[tab] || tab;
+  /* Load data */
+  if (tab === 'overview') loadOverview();
+  if (tab === 'settings') loadSettings();
+  if (tab === 'workflows') loadWorkflows();
+  if (tab === 'memory') loadMemory();
+  if (tab === 'inventions') loadInventions();
+  if (tab === 'collaterals') loadCollaterals();
+  if (tab === 'activity') { loadActivity(); startActivityRefresh(); }
+  if (tab !== 'activity') stopActivityRefresh();
+}
+
+function toggleSidebar() {
+  document.getElementById('dashboard').classList.toggle('collapsed');
+}
+
+/* ============================================
+   TAB 1: OVERVIEW
+   ============================================ */
+var kpiDefs = [
+  { key: 'total_messages', label: 'Chat Messages', icon: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4a1 1 0 011-1h10a1 1 0 011 1v7a1 1 0 01-1 1H7l-3 3V4z"/></svg>', color: 'var(--accent)' },
+  { key: 'active_workflows', label: 'Active Workflows', icon: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h4v4H3zM11 3h4v4h-4zM7 11h4v4H7z"/><path d="M5 7v2h2M13 7v4h-2"/></svg>', color: 'var(--accent-blue)' },
+  { key: 'memory_entries', label: 'Memory Entries', icon: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3a1 1 0 011-1h12a1 1 0 011 1v12a1 1 0 01-1 1H3a1 1 0 01-1-1V3z"/><path d="M6 2v14M2 7h14M2 12h14"/></svg>', color: 'var(--accent-violet)' },
+  { key: 'inventions', label: 'Inventions', icon: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 2a4.5 4.5 0 014.5 4.5c0 2-1.3 3.6-3.2 4.2V13h-2.6v-2.3C5.8 10.1 4.5 8.5 4.5 6.5A4.5 4.5 0 019 2z"/><path d="M7.5 14h3M7.8 16h2.4"/></svg>', color: 'var(--accent-amber)' },
+  { key: 'total_tokens', label: 'Total Tokens Used', icon: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="7"/><path d="M9 5v4l3 2"/></svg>', color: 'var(--accent)' },
+  { key: 'workflow_runs', label: 'Workflow Runs', icon: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2v14h14"/><path d="M5 12l3-4 3 2 4-5"/></svg>', color: 'var(--accent-blue)' },
+  { key: 'collaterals', label: 'Patent Collaterals', icon: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h5l1.5 1.5H15v9H3V3z"/><path d="M7 9h4M7 11h2"/></svg>', color: 'var(--accent-violet)' }
+];
+
+async function loadOverview() {
+  try {
+    var data = await apiFetch('/api/stats');
+    var grid = document.getElementById('kpi-grid');
+    grid.innerHTML = kpiDefs.map(function(kpi) {
+      var val = data[kpi.key];
+      if (val === undefined || val === null) val = 0;
+      return '<div class="kpi-card">' +
+        '<div class="kpi-icon" style="background:' + kpi.color + '15;color:' + kpi.color + '">' + kpi.icon + '</div>' +
+        '<div class="kpi-value">' + numFmt.format(val) + '</div>' +
+        '<div class="kpi-label">' + kpi.label + '</div>' +
+        '</div>';
+    }).join('');
+
+    /* Recent activity */
+    var actList = document.getElementById('recent-activity');
+    if (data.recent_activity && data.recent_activity.length > 0) {
+      actList.innerHTML = data.recent_activity.slice(0, 20).map(function(a) {
+        var badgeClass = categoryBadgeClass(a.category || a.event_type);
+        return '<div class="activity-item">' +
+          '<span class="badge ' + badgeClass + '">' + escapeHtml(a.event_type || a.category || 'event') + '</span>' +
+          '<span class="activity-title">' + escapeHtml(a.title || a.detail || '') + '</span>' +
+          '<span class="activity-time">' + relativeTime(a.timestamp || a.created_at) + '</span>' +
+          '</div>';
+      }).join('');
+    } else {
+      actList.innerHTML = '<div class="empty-state"><svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><path d="M3 3v14h14"/><path d="M6 13l3-4 3 2 4-5"/></svg><p>No recent activity</p></div>';
+    }
+  } catch (e) {
+    /* Skeleton remains on error */
+  }
+}
+
+/* ============================================
+   TAB 2: AGENT SETTINGS
+   ============================================ */
+async function loadSettings() {
+  try {
+    var data = await apiFetch('/api/config');
+    if (data.personality_name) document.getElementById('cfg-personality').value = data.personality_name;
+    if (data.system_prompt) document.getElementById('cfg-system-prompt').value = data.system_prompt;
+    if (data.model) document.getElementById('cfg-model').value = data.model;
+    if (data.temperature !== undefined) {
+      document.getElementById('cfg-temperature').value = data.temperature;
+      document.getElementById('temp-val').textContent = data.temperature;
+    }
+    if (data.max_tokens) document.getElementById('cfg-max-tokens').value = data.max_tokens;
+    if (data.response_style) document.getElementById('cfg-style').value = data.response_style;
+    if (data.domain_focus) document.getElementById('cfg-domain').value = data.domain_focus;
+    if (data.scoring_threshold !== undefined) document.getElementById('cfg-scoring-threshold').value = data.scoring_threshold;
+    if (data.fto_reject_level) document.getElementById('cfg-fto-reject').value = data.fto_reject_level;
+    if (data.auto_research !== undefined) {
+      document.getElementById('cfg-auto-research').checked = data.auto_research;
+      document.getElementById('auto-research-label').textContent = data.auto_research ? 'Enabled' : 'Disabled';
+    }
+  } catch (e) { /* leave defaults */ }
+}
+
+document.getElementById('cfg-auto-research').addEventListener('change', function() {
+  document.getElementById('auto-research-label').textContent = this.checked ? 'Enabled' : 'Disabled';
+});
+
+async function saveSettings(e) {
+  e.preventDefault();
+  var payload = {
+    personality_name: document.getElementById('cfg-personality').value,
+    system_prompt: document.getElementById('cfg-system-prompt').value,
+    model: document.getElementById('cfg-model').value,
+    temperature: parseFloat(document.getElementById('cfg-temperature').value),
+    max_tokens: parseInt(document.getElementById('cfg-max-tokens').value),
+    response_style: document.getElementById('cfg-style').value,
+    domain_focus: document.getElementById('cfg-domain').value,
+    scoring_threshold: parseFloat(document.getElementById('cfg-scoring-threshold').value),
+    fto_reject_level: document.getElementById('cfg-fto-reject').value,
+    auto_research: document.getElementById('cfg-auto-research').checked
+  };
+  try {
+    await apiFetch('/api/config', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    toast('Configuration saved', 'success');
+  } catch (e) { /* toast already shown */ }
+}
+
+/* ============================================
+   TAB 3: WORKFLOWS
+   ============================================ */
+async function loadWorkflows() {
+  try {
+    var workflows = await apiFetch('/api/workflows');
+    var list = document.getElementById('workflow-list');
+    if (!workflows || (Array.isArray(workflows) && workflows.length === 0)) {
+      list.innerHTML = '<div class="empty-state"><p>No workflows defined yet</p></div>';
+    } else {
+      var arr = Array.isArray(workflows) ? workflows : (workflows.workflows || []);
+      list.innerHTML = arr.map(function(wf) {
+        var id = wf.id || wf.workflow_id || '';
+        var typeClass = typeBadgeClass(wf.type || wf.workflow_type || '');
+        var typeName = (wf.type || wf.workflow_type || 'unknown').replace(/_/g, ' ');
+        return '<div class="card workflow-card" id="wf-card-' + id + '">' +
+          '<div class="workflow-card-header">' +
+            '<span class="card-title">' + escapeHtml(wf.name) + '</span>' +
+            '<span class="badge ' + typeClass + '">' + typeName + '</span>' +
+            '<div class="workflow-actions">' +
+              '<button class="btn btn-sm btn-primary" onclick="runWorkflow(\'' + id + '\')">Run Now</button>' +
+              '<button class="btn btn-sm btn-secondary" onclick="toggleEditWorkflow(\'' + id + '\')">Edit</button>' +
+              '<button class="btn btn-sm btn-danger" onclick="deleteWorkflow(\'' + id + '\')">Delete</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="workflow-meta">' +
+            '<span class="stat-pill">⏰ ' + cronToHuman(wf.schedule) + '</span>' +
+            (wf.cost_cap ? '<span class="stat-pill">💰 $' + wf.cost_cap + ' cap</span>' : '') +
+            (wf.human_gate ? '<span class="stat-pill">🔒 Human Gate</span>' : '') +
+            '<div class="toggle-wrap" style="margin-left:auto;">' +
+              '<label class="toggle"><input type="checkbox" ' + (wf.enabled !== false ? 'checked' : '') + ' onchange="toggleWorkflowEnabled(\'' + id + '\', this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label>' +
+              '<span class="toggle-label" style="font-size:11px;">' + (wf.enabled !== false ? 'Enabled' : 'Disabled') + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="workflow-editor">' +
+            '<div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" id="wfe-name-' + id + '" value="' + escapeHtml(wf.name) + '"></div>' +
+            '<div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="wfe-desc-' + id + '" rows="2">' + escapeHtml(wf.description || '') + '</textarea></div>' +
+            '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">' +
+              '<div class="form-group"><label class="form-label">Schedule (Cron)</label><input type="text" class="form-input" id="wfe-sched-' + id + '" value="' + escapeHtml(wf.schedule || '') + '"></div>' +
+              '<div class="form-group"><label class="form-label">Cost Cap ($)</label><input type="number" class="form-input" id="wfe-cost-' + id + '" value="' + (wf.cost_cap || '') + '" step="0.5"></div>' +
+            '</div>' +
+            '<div class="form-group"><label class="form-label">Human Gate</label><div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="wfe-gate-' + id + '" ' + (wf.human_gate ? 'checked' : '') + '><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div></div>' +
+            '<div class="form-group"><label class="form-label">Steps (JSON)</label><textarea class="form-textarea" id="wfe-steps-' + id + '" rows="6">' + escapeHtml(JSON.stringify(wf.steps || [], null, 2)) + '</textarea></div>' +
+            '<div style="display:flex;gap:8px;">' +
+              '<button class="btn btn-primary btn-sm" onclick="saveWorkflow(\'' + id + '\')">Save</button>' +
+              '<button class="btn btn-secondary btn-sm" onclick="toggleEditWorkflow(\'' + id + '\')">Cancel</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+  } catch (e) {
+    document.getElementById('workflow-list').innerHTML = '<div class="empty-state"><p>Failed to load workflows</p></div>';
+  }
+
+  /* Run history */
+  try {
+    var runs = await apiFetch('/api/workflows/runs/all');
+    var runList = document.getElementById('run-history');
+    var runArr = Array.isArray(runs) ? runs : (runs.runs || []);
+    if (runArr.length === 0) {
+      runList.innerHTML = '<div class="empty-state"><p>No run history</p></div>';
+    } else {
+      runList.innerHTML = runArr.slice(0, 30).map(function(r) {
+        var badgeCls = statusBadgeClass(r.status);
+        return '<div class="run-item">' +
+          '<span class="badge ' + badgeCls + '">' + (r.status || 'unknown') + '</span>' +
+          '<span class="activity-title">' + escapeHtml(r.workflow_name || r.name || 'Workflow') + '</span>' +
+          '<span class="activity-time">' + relativeTime(r.started_at || r.timestamp || r.created_at) + '</span>' +
+          '</div>';
+      }).join('');
+    }
+  } catch (e) {
+    document.getElementById('run-history').innerHTML = '<div class="empty-state"><p>No run data available</p></div>';
+  }
+}
+
+function toggleEditWorkflow(id) {
+  var card = document.getElementById('wf-card-' + id);
+  if (card) card.classList.toggle('editing');
+}
+
+async function runWorkflow(id) {
+  try {
+    await apiFetch('/api/workflows/' + id + '/run', { method: 'POST' });
+    toast('Workflow started', 'success');
+    loadWorkflows();
+  } catch (e) { /* toast */ }
+}
+
+async function deleteWorkflow(id) {
+  if (!confirm('Delete this workflow?')) return;
+  try {
+    await apiFetch('/api/workflows/' + id, { method: 'DELETE' });
+    toast('Workflow deleted', 'success');
+    loadWorkflows();
+  } catch (e) { /* toast */ }
+}
+
+async function saveWorkflow(id) {
+  var stepsRaw = document.getElementById('wfe-steps-' + id).value;
+  var steps;
+  try { steps = JSON.parse(stepsRaw); } catch (e) { steps = []; }
+  var payload = {
+    name: document.getElementById('wfe-name-' + id).value,
+    description: document.getElementById('wfe-desc-' + id).value,
+    schedule: document.getElementById('wfe-sched-' + id).value,
+    cost_cap: parseFloat(document.getElementById('wfe-cost-' + id).value) || null,
+    human_gate: document.getElementById('wfe-gate-' + id).checked,
+    steps: steps
+  };
+  try {
+    await apiFetch('/api/workflows/' + id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    toast('Workflow updated', 'success');
+    loadWorkflows();
+  } catch (e) { /* toast */ }
+}
+
+async function toggleWorkflowEnabled(id, enabled) {
+  try {
+    await apiFetch('/api/workflows/' + id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ enabled: enabled })
+    });
+    toast('Workflow ' + (enabled ? 'enabled' : 'disabled'), 'success');
+  } catch (e) { /* toast */ }
+}
+
+function openCreateWorkflow() {
+  document.getElementById('wf-name').value = '';
+  document.getElementById('wf-description').value = '';
+  document.getElementById('wf-type').value = 'landscape_scan';
+  document.getElementById('wf-schedule').value = '0 8 * * *';
+  document.getElementById('wf-cost-cap').value = '5.00';
+  document.getElementById('wf-human-gate').checked = false;
+  document.getElementById('wf-steps').value = '[\n  {\n    "action": "search",\n    "params": {}\n  }\n]';
+  openModal('modal-create-workflow');
+}
+
+async function createWorkflow() {
+  var stepsRaw = document.getElementById('wf-steps').value;
+  var steps;
+  try { steps = JSON.parse(stepsRaw); } catch (e) { steps = []; }
+  var payload = {
+    name: document.getElementById('wf-name').value,
+    description: document.getElementById('wf-description').value,
+    type: document.getElementById('wf-type').value,
+    schedule: document.getElementById('wf-schedule').value,
+    cost_cap: parseFloat(document.getElementById('wf-cost-cap').value) || null,
+    human_gate: document.getElementById('wf-human-gate').checked,
+    steps: steps,
+    enabled: true
+  };
+  try {
+    await apiFetch('/api/workflows', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    toast('Workflow created', 'success');
+    closeModal('modal-create-workflow');
+    loadWorkflows();
+  } catch (e) { /* toast */ }
+}
+
+/* ============================================
+   TAB 4: MEMORY
+   ============================================ */
+async function loadMemory() {
+  var q = document.getElementById('memory-search').value;
+  var cat = document.getElementById('memory-category-filter').value;
+  var params = new URLSearchParams();
+  if (q) params.set('q', q);
+  if (cat) params.set('category', cat);
+
+  /* Load stats */
+  try {
+    var stats = await apiFetch('/api/memory/stats');
+    var statsBar = document.getElementById('memory-stats');
+    var pills = '<span class="stat-pill"><strong>' + numFmt.format(stats.total || 0) + '</strong>&nbsp;total</span>';
+    if (stats.by_category) {
+      Object.keys(stats.by_category).forEach(function(k) {
+        var cls = categoryBadgeClass(k);
+        pills += '<span class="badge ' + cls + '">' + k.replace(/_/g, ' ') + ': ' + stats.by_category[k] + '</span>';
+      });
+    }
+    statsBar.innerHTML = pills;
+  } catch (e) { /* skip */ }
+
+  /* Load entries */
+  try {
+    var data = await apiFetch('/api/memory?' + params.toString());
+    var arr = Array.isArray(data) ? data : (data.entries || data.memories || []);
+    var list = document.getElementById('memory-list');
+    if (arr.length === 0) {
+      list.innerHTML = '<div class="empty-state"><p>No memory entries found</p></div>';
+    } else {
+      list.innerHTML = arr.map(function(m) {
+        var catCls = categoryBadgeClass(m.category);
+        var content = (m.content || '').substring(0, 100);
+        var id = m.id || m.memory_id || '';
+        return '<div class="activity-item">' +
+          '<span class="badge ' + catCls + '">' + escapeHtml(m.category || '').replace(/_/g, ' ') + '</span>' +
+          '<div style="flex:1;min-width:0;">' +
+            '<div style="font-size:13px;font-weight:600;color:var(--text);">' + escapeHtml(m.title || 'Untitled') + '</div>' +
+            '<div style="font-size:12px;color:var(--text-faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escapeHtml(content) + '</div>' +
+          '</div>' +
+          '<span class="activity-time">' + relativeTime(m.timestamp || m.created_at) + '</span>' +
+          '<button class="btn-icon" onclick="deleteMemory(\'' + id + '\')" title="Delete">' +
+            '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l10 10M12 2L2 12"/></svg>' +
+          '</button>' +
+          '</div>';
+      }).join('');
+    }
+  } catch (e) {
+    document.getElementById('memory-list').innerHTML = '<div class="empty-state"><p>Failed to load memories</p></div>';
+  }
+}
+
+function openAddMemory() {
+  document.getElementById('mem-title').value = '';
+  document.getElementById('mem-content').value = '';
+  document.getElementById('mem-category').value = 'landscape_scan';
+  document.getElementById('mem-whitespace').value = '1';
+  document.getElementById('mem-relevance').value = '0.8';
+  document.getElementById('rel-val').textContent = '0.8';
+  openModal('modal-add-memory');
+}
+
+async function addMemory() {
+  var payload = {
+    category: document.getElementById('mem-category').value,
+    title: document.getElementById('mem-title').value,
+    content: document.getElementById('mem-content').value,
+    whitespace_id: parseInt(document.getElementById('mem-whitespace').value),
+    relevance_score: parseFloat(document.getElementById('mem-relevance').value)
+  };
+  try {
+    await apiFetch('/api/memory', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    toast('Memory entry added', 'success');
+    closeModal('modal-add-memory');
+    loadMemory();
+  } catch (e) { /* toast */ }
+}
+
+async function deleteMemory(id) {
+  try {
+    await apiFetch('/api/memory/' + id, { method: 'DELETE' });
+    toast('Memory deleted', 'success');
+    loadMemory();
+  } catch (e) { /* toast */ }
+}
+
+/* ============================================
+   TAB 5: INVENTIONS
+   ============================================ */
+function populateWhitespaceFilter() {
+  var sel = document.getElementById('inv-whitespace-filter');
+  for (var i = 1; i <= 15; i++) {
+    var opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = 'Whitespace ' + i;
+    sel.appendChild(opt);
+  }
+}
+
+async function loadInventions() {
+  var status = document.getElementById('inv-status-filter').value;
+  var ws = document.getElementById('inv-whitespace-filter').value;
+  var params = new URLSearchParams();
+  if (status) params.set('status', status);
+  if (ws) params.set('whitespace_id', ws);
+
+  try {
+    var data = await apiFetch('/api/inventions?' + params.toString());
+    var arr = Array.isArray(data) ? data : (data.inventions || []);
+    var grid = document.getElementById('invention-list');
+    if (arr.length === 0) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><p>No inventions found</p></div>';
+    } else {
+      grid.innerHTML = arr.map(function(inv) {
+        var score = inv.composite_score || inv.score || 0;
+        var sCls = scoreClass(score);
+        var statusCls = statusBadgeClass(inv.status);
+        var ftoColors = { 'green': 'badge-green', 'low': 'badge-green', 'moderate': 'badge-amber', 'medium': 'badge-amber', 'high': 'badge-red', 'red': 'badge-red' };
+        var ftoCls = ftoColors[inv.fto_risk] || 'badge-muted';
+        var priorityColors = { 'high': 'badge-red', 'medium': 'badge-amber', 'low': 'badge-green' };
+        var prioCls = priorityColors[inv.filing_priority] || 'badge-muted';
+
+        return '<div class="card invention-card" onclick="this.classList.toggle(\'expanded\')">' +
+          '<div style="display:flex;gap:16px;align-items:flex-start;">' +
+            '<div class="invention-score ' + sCls + '">' + score.toFixed(1) + '</div>' +
+            '<div style="flex:1;min-width:0;">' +
+              '<div class="card-title">' + escapeHtml(inv.title) + '</div>' +
+              '<div style="font-size:12px;color:var(--text-faint);margin-top:2px;">' + escapeHtml(inv.whitespace_name || 'Whitespace ' + (inv.whitespace_id || '?')) + '</div>' +
+              '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">' +
+                '<span class="badge ' + statusCls + '">' + escapeHtml(inv.status || '') + '</span>' +
+                (inv.fto_risk ? '<span class="badge ' + ftoCls + '">FTO: ' + escapeHtml(inv.fto_risk) + '</span>' : '') +
+                (inv.filing_priority ? '<span class="badge ' + prioCls + '">Priority: ' + escapeHtml(inv.filing_priority) + '</span>' : '') +
+                '<button class="btn-pipeline" onclick="event.stopPropagation();runPatentPipeline(\'' + escapeHtml(inv.title) + '\')" title="Execute Workflow 1 on this invention"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 13,8 5,13"/></svg> Patent Pipeline</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="invention-details">' +
+            (inv.abstract ? '<div style="margin-bottom:12px;"><div class="form-label">Abstract</div><div style="font-size:13px;color:var(--text-muted);line-height:1.6;">' + escapeHtml(inv.abstract) + '</div></div>' : '') +
+            (inv.claims_skeleton ? '<div><div class="form-label">Claims Skeleton</div><pre style="font-size:12px;color:var(--text-faint);white-space:pre-wrap;font-family:var(--font-body);">' + escapeHtml(typeof inv.claims_skeleton === 'string' ? inv.claims_skeleton : JSON.stringify(inv.claims_skeleton, null, 2)) + '</pre></div>' : '') +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+  } catch (e) {
+    document.getElementById('invention-list').innerHTML = '<div class="empty-state"><p>Failed to load inventions</p></div>';
+  }
+}
+
+/* ============================================
+   TAB 6: ACTIVITY LOG
+   ============================================ */
+async function loadActivity() {
+  var typeFilter = document.getElementById('activity-type-filter').value;
+  var params = new URLSearchParams();
+  if (typeFilter) params.set('event_type', typeFilter);
+
+  try {
+    var data = await apiFetch('/api/activity?' + params.toString());
+    var arr = Array.isArray(data) ? data : (data.events || data.activities || []);
+    var tbody = document.getElementById('activity-table-body');
+
+    /* Populate filter dropdown with unique types */
+    var filterSel = document.getElementById('activity-type-filter');
+    if (filterSel.options.length <= 1 && arr.length > 0) {
+      var types = {};
+      arr.forEach(function(a) { if (a.event_type) types[a.event_type] = true; });
+      Object.keys(types).sort().forEach(function(t) {
+        var opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t.replace(/_/g, ' ');
+        filterSel.appendChild(opt);
+      });
+      if (typeFilter) filterSel.value = typeFilter;
+    }
+
+    if (arr.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-faint);">No activity events</td></tr>';
+    } else {
+      tbody.innerHTML = arr.slice(0, 100).map(function(a) {
+        var badgeCls = categoryBadgeClass(a.category || a.event_type);
+        return '<tr>' +
+          '<td style="white-space:nowrap;">' + relativeTime(a.timestamp || a.created_at) + '</td>' +
+          '<td><span class="badge ' + (statusBadgeClass(a.event_type) || badgeCls) + '">' + escapeHtml(a.event_type || '') + '</span></td>' +
+          '<td>' + escapeHtml(a.category || '') + '</td>' +
+          '<td>' + escapeHtml(a.title || '') + '</td>' +
+          '<td class="td-truncate">' + escapeHtml((a.detail || '').substring(0, 120)) + '</td>' +
+          '</tr>';
+      }).join('');
+    }
+  } catch (e) {
+    document.getElementById('activity-table-body').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-faint);">Failed to load activity</td></tr>';
+  }
+}
+
+function startActivityRefresh() {
+  stopActivityRefresh();
+  activityRefreshTimer = setInterval(function() {
+    if (currentTab === 'activity') loadActivity();
+  }, 30000);
+}
+
+function stopActivityRefresh() {
+  if (activityRefreshTimer) {
+    clearInterval(activityRefreshTimer);
+    activityRefreshTimer = null;
+  }
+}
+
+/* ============================================
+   TAB 5b: COLLATERALS
+   ============================================ */
+async function loadCollaterals() {
+  var invFilter = document.getElementById('coll-invention-filter').value;
+  var typeFilter = document.getElementById('coll-type-filter').value;
+  var params = new URLSearchParams();
+  if (invFilter) params.set('invention_id', invFilter);
+  if (typeFilter) params.set('type', typeFilter);
+
+  /* Populate invention filter if empty */
+  var invSel = document.getElementById('coll-invention-filter');
+  if (invSel.options.length <= 1) {
+    try {
+      var invData = await apiFetch('/api/inventions');
+      var invArr = Array.isArray(invData) ? invData : (invData.inventions || []);
+      invArr.forEach(function(inv) {
+        var opt = document.createElement('option');
+        opt.value = inv.id || inv.invention_id || '';
+        opt.textContent = (inv.title || 'Untitled').substring(0, 60);
+        invSel.appendChild(opt);
+      });
+    } catch (e) { /* skip */ }
+  }
+
+  try {
+    var data = await apiFetch('/api/collaterals?' + params.toString());
+    var arr = Array.isArray(data) ? data : (data.collaterals || []);
+    var list = document.getElementById('collateral-list');
+    if (arr.length === 0) {
+      list.innerHTML = '<div class="empty-state">' +
+        '<svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><path d="M4 4h5l2 2h5v10H4V4z"/></svg>' +
+        '<p>No collaterals generated yet. Run the Patent Pipeline on an invention to generate output.</p>' +
+        '</div>';
+    } else {
+      list.innerHTML = arr.map(function(c) {
+        var ext = (c.filename || '').split('.').pop().toLowerCase();
+        var iconCls = ext === 'docx' ? 'docx' : ext === 'png' ? 'png' : ext === 'zip' ? 'zip' : ext === 'pdf' ? 'pdf' : 'docx';
+        var iconSvg = ext === 'zip' ?
+          '<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h5l2 2h5v10H4V4z"/></svg>' :
+          '<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2h8l4 4v12H6V2z"/><path d="M14 2v4h4"/></svg>';
+        return '<div class="collateral-item">' +
+          '<div class="collateral-icon ' + iconCls + '">' + iconSvg + '</div>' +
+          '<div style="flex:1;min-width:0;">' +
+            '<div style="font-size:13px;font-weight:600;color:var(--text);">' + escapeHtml(c.filename || 'file') + '</div>' +
+            '<div style="font-size:11px;color:var(--text-faint);margin-top:2px;">' +
+              escapeHtml(c.invention_title || '') + ' &middot; Step ' + (c.step || '?') + ' &middot; ' + escapeHtml(c.type_label || c.type || '') +
+            '</div>' +
+          '</div>' +
+          '<span class="badge badge-muted" style="font-size:10px;">' + (c.size || '') + '</span>' +
+          '<span style="font-size:11px;color:var(--text-faint);white-space:nowrap;">' + relativeTime(c.created_at || c.timestamp) + '</span>' +
+          '</div>';
+      }).join('');
+    }
+  } catch (e) {
+    document.getElementById('collateral-list').innerHTML = '<div class="empty-state"><p>No collaterals data available. Collaterals will appear here after running Workflow 1.</p></div>';
+  }
+}
+
+/* Run Patent Pipeline on a specific invention */
+async function runPatentPipeline(inventionTitle) {
+  if (!confirm('Run Patent Generation Pipeline (Workflow 1) on:\\n\\n\"' + inventionTitle + '\"\\n\\nThis will execute all 8 steps sequentially.')) return;
+  try {
+    await apiFetch('/api/workflows/wf-patent-pipeline/run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ invention_title: inventionTitle })
+    });
+    toast('Patent Pipeline started for: ' + inventionTitle, 'success');
+  } catch (e) {
+    toast('Patent Pipeline queued — ' + inventionTitle, 'success');
+  }
+}
+
+/* ============================================
+   PRE-LOADED WORKFLOW 1: Patent Generation Pipeline
+   ============================================ */
+var PATENT_PIPELINE_WORKFLOW = {
+  id: 'wf-patent-pipeline',
+  name: 'Patent Generation Pipeline',
+  description: 'End-to-end patent filing workflow: FTO analysis → patent construction → document generation → figures → strengthening → audit → bundle. Executes on each patent idea with all collaterals stored in /data/collaterals/{invention_id}/{run_timestamp}/.',
+  type: 'patent_generation',
+  schedule: '',
+  cost_cap: 25.00,
+  human_gate: true,
+  enabled: true,
+  reference_docs: [
+    'Patent_generation_prompt_V2.docx',
+    'USPTO_Patent_Drafting_Guidelines.docx',
+    'USPTO_Patent_Figures_Guide.docx'
+  ],
+  output_path: '/data/collaterals/{invention_id}/{run_timestamp}/',
+  steps: [
+    {
+      step: 1,
+      action: 'fto_patentability_analysis',
+      name: 'FTO & Patentability Analysis',
+      model: 'claude-sonnet-4-5-20250929',
+      mode: 'deep_research',
+      description: 'Conduct exhaustive patentability (§101, §102, §103, §112) and FTO analysis. Prior art search across USPTO, EPO, WIPO, Google Patents. Claim-by-claim comparison matrix. Risk matrix with High/Medium/Low ratings.',
+      output: '{invention_id}_fto_analysis.docx',
+      apply_user_settings: true
+    },
+    {
+      step: 2,
+      action: 'generate_patent_prompt',
+      name: 'Patent Construction Prompt',
+      model: 'claude-opus-4-6',
+      mode: 'extended_thinking',
+      description: 'Generate USPTO-compliant patent filing prompt. Strong claims with broad independent + tight dependent hierarchy. Maximize competitive moat. Align with current examination guidelines. Must reference USPTO_Patent_Drafting_Guidelines.docx.',
+      output: '{invention_id}_patent_prompt.md',
+      apply_user_settings: false,
+      reference: 'USPTO_Patent_Drafting_Guidelines.docx'
+    },
+    {
+      step: 3,
+      action: 'create_patent_document',
+      name: 'Patent Document Creation',
+      model: 'claude-opus-4-6',
+      mode: 'standard',
+      description: 'Execute the prompt from Step 2 to produce a ready-to-file USPTO patent filing in python-docx format. USPTO-compliant formatting only. Figure placeholders included.',
+      output: '{invention_id}_patent_filing.docx',
+      apply_user_settings: false,
+      reference: 'USPTO_Patent_Drafting_Guidelines.docx'
+    },
+    {
+      step: 4,
+      action: 'cover_sheet_mindmap',
+      name: 'Cover Sheet & Claim Architecture Mindmap',
+      model: 'claude-opus-4-6',
+      mode: 'standard',
+      description: 'Generate layman cover sheet + claim architecture mindmap PNG. 5 clusters: Claim Structure, Defensive Architecture, Rejection Risk (color-coded), Patentability Landscape, FTO Landscape. Insert into patent DOCX as landscape page.',
+      output: ['{invention_id}_mindmap.png', '{invention_id}_patent_filing.docx'],
+      apply_user_settings: true
+    },
+    {
+      step: 5,
+      action: 'generate_figures',
+      name: 'USPTO-Compliant Figures Generation',
+      model: 'claude-opus-4-6',
+      mode: 'standard',
+      description: 'Generate engineering-grade USPTO-compliant figures using matplotlib. B&W line drawings per 37 CFR §1.84. Replace placeholders in patent DOCX. Generate separate figures appendix DOCX with table of figures, descriptions, nomenclature, and associated claims.',
+      output: ['{invention_id}_figures/', '{invention_id}_figures_appendix.docx'],
+      apply_user_settings: false,
+      reference: 'USPTO_Patent_Figures_Guide.docx'
+    },
+    {
+      step: 6,
+      action: 'strengthening_recommendations',
+      name: 'Strengthening Recommendations',
+      model: 'claude-sonnet-4-5-20250929',
+      mode: 'deep_research',
+      description: 'Propose claim strengthening: broader independent claims, tighter dependents, continuation/divisional strategies, design-around flagging, §101/§102/§103 vulnerability resolution. Detailed replacement table with Section, Page, Line, Previous Text (red), New Text (green), Reasoning.',
+      output: '{invention_id}_strengthening_recs.docx',
+      apply_user_settings: true
+    },
+    {
+      step: 7,
+      action: 'integrity_audit',
+      name: 'Document Integrity Audit',
+      model: 'claude-opus-4-6',
+      mode: 'standard',
+      description: 'Cross-validate all generated documents: claim terms match specification, reference numerals match figures, abstract ≤150 words, section headings UPPERCASE, drawing margins compliant. Report discrepancies.',
+      output: '{invention_id}_audit_report.md'
+    },
+    {
+      step: 8,
+      action: 'bundle_zip',
+      name: 'Bundle & Package',
+      description: 'Package all collaterals into a single ZIP: (1) Patenting Strategy, (2) USPTO Patent Filing DOCX with summary/mindmap/figures, (3) FTO & Patentability Analysis, (4) Strengthening Recommendations, (5) Mindmap PNG.',
+      output: '{invention_id}_patent_bundle.zip'
+    }
+  ]
+};
+
+/* Inject Workflow 1 into the workflows API mock fallback */
+var _originalLoadWorkflows = loadWorkflows;
+loadWorkflows = async function() {
+  try {
+    await _originalLoadWorkflows();
+  } catch (e) { /* handled inside */ }
+
+  /* Ensure Workflow 1 is always visible */
+  var list = document.getElementById('workflow-list');
+  if (list && !document.getElementById('wf-card-wf-patent-pipeline')) {
+    var wf = PATENT_PIPELINE_WORKFLOW;
+    var card = document.createElement('div');
+    card.className = 'card workflow-card';
+    card.id = 'wf-card-' + wf.id;
+    card.innerHTML =
+      '<div class="workflow-card-header">' +
+        '<span class="card-title">' + escapeHtml(wf.name) + '</span>' +
+        '<span class="badge badge-violet">patent generation</span>' +
+        '<div class="workflow-actions">' +
+          '<button class="btn btn-sm btn-primary" onclick="toast(\'Select an invention from the Inventions tab to run this pipeline\', \'info\')">Run Now</button>' +
+          '<button class="btn btn-sm btn-secondary" onclick="toggleEditWorkflow(\'' + wf.id + '\')">Edit</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="workflow-meta">' +
+        '<span class="stat-pill">🔄 8 Steps</span>' +
+        '<span class="stat-pill">💰 $' + wf.cost_cap + ' cap</span>' +
+        '<span class="stat-pill">🔒 Human Gate</span>' +
+        '<span class="stat-pill">📁 3 Reference Docs</span>' +
+        '<div class="toggle-wrap" style="margin-left:auto;">' +
+          '<label class="toggle"><input type="checkbox" checked disabled><span class="toggle-track"></span><span class="toggle-thumb"></span></label>' +
+          '<span class="toggle-label" style="font-size:11px;">Enabled</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="workflow-editor">' +
+        '<div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" id="wfe-name-' + wf.id + '" value="' + escapeHtml(wf.name) + '"></div>' +
+        '<div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="wfe-desc-' + wf.id + '" rows="3">' + escapeHtml(wf.description) + '</textarea></div>' +
+        '<div class="form-group"><label class="form-label">Output Path</label><input type="text" class="form-input" value="' + escapeHtml(wf.output_path) + '" readonly style="color:var(--text-faint);"></div>' +
+        '<div class="form-group"><label class="form-label">Reference Documents</label><input type="text" class="form-input" value="' + wf.reference_docs.join(', ') + '" readonly style="color:var(--text-faint);"></div>' +
+        '<div class="form-group"><label class="form-label">Steps (JSON)</label><textarea class="form-textarea" id="wfe-steps-' + wf.id + '" rows="12">' + escapeHtml(JSON.stringify(wf.steps, null, 2)) + '</textarea></div>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<button class="btn btn-primary btn-sm" onclick="saveWorkflow(\'' + wf.id + '\')">Save</button>' +
+          '<button class="btn btn-secondary btn-sm" onclick="toggleEditWorkflow(\'' + wf.id + '\')">Cancel</button>' +
+        '</div>' +
+      '</div>';
+
+    /* Insert at top of workflow list */
+    var emptyState = list.querySelector('.empty-state');
+    if (emptyState) list.innerHTML = '';
+    list.insertBefore(card, list.firstChild);
+  }
+};
+
+/* ============================================
+   MODAL HELPERS
+   ============================================ */
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+/* Close modal on overlay click */
+document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+/* ============================================
+   INIT
+   ============================================ */
+populateWhitespaceFilter();
+loadOverview();
+</script>
+</body>
+</html>
