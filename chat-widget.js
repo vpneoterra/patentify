@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   IPCo Agentic Chat Widget — Frontend Integration Layer
+   Patentify Agentic Chat Widget — Frontend Integration Layer
    Injected into the parent frame; communicates with FastAPI backend
    via port/8000. Provides floating chat, workflow status badges,
    and real-time event indicators across all 3 views.
@@ -19,7 +19,7 @@
   const style = document.createElement('style');
   style.textContent = `
     /* Chat FAB */
-    .ipco-chat-fab {
+    .ptfy-chat-fab {
       position: fixed;
       bottom: 24px;
       right: 24px;
@@ -36,13 +36,13 @@
       box-shadow: 0 4px 20px rgba(46,139,122,0.4);
       transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
     }
-    .ipco-chat-fab:hover {
+    .ptfy-chat-fab:hover {
       transform: scale(1.08);
       box-shadow: 0 6px 28px rgba(46,139,122,0.5);
     }
-    .ipco-chat-fab:active { transform: scale(0.96); }
-    .ipco-chat-fab svg { width: 24px; height: 24px; fill: white; }
-    .ipco-chat-fab .badge {
+    .ptfy-chat-fab:active { transform: scale(0.96); }
+    .ptfy-chat-fab svg { width: 24px; height: 24px; fill: white; }
+    .ptfy-chat-fab .badge {
       position: absolute; top: -2px; right: -2px;
       width: 16px; height: 16px; border-radius: 50%;
       background: #D4A017; border: 2px solid #000;
@@ -51,7 +51,7 @@
     }
 
     /* Chat Panel */
-    .ipco-chat-panel {
+    .ptfy-chat-panel {
       position: fixed;
       bottom: 92px;
       right: 24px;
@@ -69,14 +69,14 @@
       pointer-events: none;
       transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
     }
-    .ipco-chat-panel.open {
+    .ptfy-chat-panel.open {
       opacity: 1;
       transform: translateY(0) scale(1);
       pointer-events: all;
     }
 
     /* Chat Header */
-    .ipco-chat-header {
+    .ptfy-chat-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -85,29 +85,29 @@
       background: #050505;
       border-radius: 16px 16px 0 0;
     }
-    .ipco-chat-header-left {
+    .ptfy-chat-header-left {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .ipco-chat-avatar {
+    .ptfy-chat-avatar {
       width: 32px; height: 32px; border-radius: 50%;
       background: linear-gradient(135deg, #2E8B7A 0%, #1a6b5a 100%);
       display: flex; align-items: center; justify-content: center;
     }
-    .ipco-chat-avatar svg { width: 16px; height: 16px; fill: white; }
-    .ipco-chat-title { font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: #F1F5F9; }
-    .ipco-chat-subtitle { font-size: 11px; color: #64748B; margin-top: 1px; }
-    .ipco-chat-close {
+    .ptfy-chat-avatar svg { width: 16px; height: 16px; fill: white; }
+    .ptfy-chat-title { font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: #F1F5F9; }
+    .ptfy-chat-subtitle { font-size: 11px; color: #64748B; margin-top: 1px; }
+    .ptfy-chat-close {
       width: 28px; height: 28px; border-radius: 6px;
       background: transparent; border: none; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       color: #64748B; transition: all 0.15s;
     }
-    .ipco-chat-close:hover { background: #1A1A1A; color: #F1F5F9; }
+    .ptfy-chat-close:hover { background: #1A1A1A; color: #F1F5F9; }
 
     /* Chat Messages */
-    .ipco-chat-messages {
+    .ptfy-chat-messages {
       flex: 1;
       overflow-y: auto;
       padding: 16px 20px;
@@ -119,7 +119,7 @@
       scrollbar-width: thin;
       scrollbar-color: #1A1A1A #0A0A0A;
     }
-    .ipco-msg {
+    .ptfy-msg {
       max-width: 85%;
       padding: 10px 14px;
       border-radius: 12px;
@@ -130,25 +130,25 @@
       word-wrap: break-word;
       white-space: pre-wrap;
     }
-    .ipco-msg.user {
+    .ptfy-msg.user {
       align-self: flex-end;
       background: #1a3a33;
       border-bottom-right-radius: 4px;
     }
-    .ipco-msg.assistant {
+    .ptfy-msg.assistant {
       align-self: flex-start;
       background: #141414;
       border: 1px solid rgba(148,163,184,0.08);
       border-bottom-left-radius: 4px;
     }
-    .ipco-msg.system {
+    .ptfy-msg.system {
       align-self: center;
       background: transparent;
       color: #64748B;
       font-size: 11px;
       padding: 4px 12px;
     }
-    .ipco-msg .tool-badge {
+    .ptfy-msg .tool-badge {
       display: inline-flex;
       align-items: center;
       gap: 4px;
@@ -160,14 +160,14 @@
       font-weight: 600;
       margin-top: 6px;
     }
-    .ipco-msg-meta {
+    .ptfy-msg-meta {
       font-size: 10px;
       color: #475569;
       margin-top: 4px;
     }
 
     /* Typing indicator */
-    .ipco-typing {
+    .ptfy-typing {
       align-self: flex-start;
       display: flex; gap: 4px;
       padding: 12px 16px;
@@ -175,20 +175,20 @@
       border-radius: 12px;
       border-bottom-left-radius: 4px;
     }
-    .ipco-typing span {
+    .ptfy-typing span {
       width: 6px; height: 6px; border-radius: 50%;
       background: #2E8B7A; opacity: 0.4;
-      animation: ipco-bounce 1.4s infinite;
+      animation: ptfy-bounce 1.4s infinite;
     }
-    .ipco-typing span:nth-child(2) { animation-delay: 0.2s; }
-    .ipco-typing span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes ipco-bounce {
+    .ptfy-typing span:nth-child(2) { animation-delay: 0.2s; }
+    .ptfy-typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes ptfy-bounce {
       0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
       30% { transform: translateY(-6px); opacity: 1; }
     }
 
     /* Chat Input */
-    .ipco-chat-input-area {
+    .ptfy-chat-input-area {
       padding: 12px 16px;
       border-top: 1px solid rgba(148,163,184,0.10);
       display: flex;
@@ -197,7 +197,7 @@
       background: #050505;
       border-radius: 0 0 16px 16px;
     }
-    .ipco-chat-input {
+    .ptfy-chat-input {
       flex: 1;
       min-height: 38px;
       max-height: 120px;
@@ -212,25 +212,25 @@
       outline: none;
       transition: border-color 0.2s;
     }
-    .ipco-chat-input::placeholder { color: #475569; }
-    .ipco-chat-input:focus { border-color: #2E8B7A; }
-    .ipco-chat-send {
+    .ptfy-chat-input::placeholder { color: #475569; }
+    .ptfy-chat-input:focus { border-color: #2E8B7A; }
+    .ptfy-chat-send {
       width: 38px; height: 38px; border-radius: 10px;
       background: #2E8B7A; border: none; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       transition: all 0.15s; flex-shrink: 0;
     }
-    .ipco-chat-send:hover { background: #36a08c; }
-    .ipco-chat-send:disabled { opacity: 0.4; cursor: not-allowed; }
-    .ipco-chat-send svg { width: 16px; height: 16px; fill: white; }
+    .ptfy-chat-send:hover { background: #36a08c; }
+    .ptfy-chat-send:disabled { opacity: 0.4; cursor: not-allowed; }
+    .ptfy-chat-send svg { width: 16px; height: 16px; fill: white; }
 
     /* Quick Actions bar */
-    .ipco-quick-actions {
+    .ptfy-quick-actions {
       display: flex; gap: 6px; flex-wrap: wrap;
       padding: 8px 16px;
       border-top: 1px solid rgba(148,163,184,0.06);
     }
-    .ipco-quick-btn {
+    .ptfy-quick-btn {
       padding: 5px 10px;
       border-radius: 8px;
       border: 1px solid rgba(148,163,184,0.12);
@@ -241,14 +241,14 @@
       cursor: pointer;
       transition: all 0.15s;
     }
-    .ipco-quick-btn:hover {
+    .ptfy-quick-btn:hover {
       background: #1A1A1A;
       color: #F1F5F9;
       border-color: #2E8B7A;
     }
 
     /* Status Indicator */
-    .ipco-status-bar {
+    .ptfy-status-bar {
       position: fixed;
       bottom: 24px;
       left: 24px;
@@ -257,7 +257,7 @@
       align-items: center;
       gap: 8px;
     }
-    .ipco-status-pill {
+    .ptfy-status-pill {
       display: flex;
       align-items: center;
       gap: 5px;
@@ -270,20 +270,20 @@
       color: #94A3B8;
       backdrop-filter: blur(8px);
     }
-    .ipco-status-dot {
+    .ptfy-status-dot {
       width: 6px; height: 6px; border-radius: 50%;
     }
-    .ipco-status-dot.green { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
-    .ipco-status-dot.amber { background: #D4A017; box-shadow: 0 0 6px rgba(212,160,23,0.5); }
-    .ipco-status-dot.red { background: #ef4444; }
+    .ptfy-status-dot.green { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .ptfy-status-dot.amber { background: #D4A017; box-shadow: 0 0 6px rgba(212,160,23,0.5); }
+    .ptfy-status-dot.red { background: #ef4444; }
 
     /* Responsive */
     @media (max-width: 480px) {
-      .ipco-chat-panel {
+      .ptfy-chat-panel {
         right: 8px; left: 8px; bottom: 80px;
         width: auto; max-height: 70vh;
       }
-      .ipco-chat-fab { right: 16px; bottom: 16px; }
+      .ptfy-chat-fab { right: 16px; bottom: 16px; }
     }
   `;
   document.head.appendChild(style);
@@ -292,7 +292,7 @@
 
   // FAB button
   const fab = document.createElement('button');
-  fab.className = 'ipco-chat-fab';
+  fab.className = 'ptfy-chat-fab';
   fab.setAttribute('aria-label', 'Open AI Chat');
   fab.innerHTML = `
     <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.82.5 3.53 1.36 5L2 22l5.16-1.28C8.54 21.52 10.22 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm-1 14h2v2h-2v-2zm0-10h2v8h-2V6z"/></svg>
@@ -302,35 +302,35 @@
 
   // Chat panel
   const panel = document.createElement('div');
-  panel.className = 'ipco-chat-panel';
-  panel.id = 'ipcoChatPanel';
+  panel.className = 'ptfy-chat-panel';
+  panel.id = 'ptfyChatPanel';
   panel.innerHTML = `
-    <div class="ipco-chat-header">
-      <div class="ipco-chat-header-left">
-        <div class="ipco-chat-avatar">
+    <div class="ptfy-chat-header">
+      <div class="ptfy-chat-header-left">
+        <div class="ptfy-chat-avatar">
           <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
         </div>
         <div>
-          <div class="ipco-chat-title">IPCo AI Strategist</div>
-          <div class="ipco-chat-subtitle" id="chatStatus">Claude Opus 4.6 — Ready</div>
+          <div class="ptfy-chat-title">Patentify AI Strategist</div>
+          <div class="ptfy-chat-subtitle" id="chatStatus">Claude Opus 4.6 — Ready</div>
         </div>
       </div>
-      <button class="ipco-chat-close" id="chatCloseBtn">
+      <button class="ptfy-chat-close" id="chatCloseBtn">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
     </div>
-    <div class="ipco-chat-messages" id="chatMessages">
-      <div class="ipco-msg system">IPCo IP Strategist — powered by Claude. Ask about whitespaces, patents, competitors, or trigger workflows.</div>
+    <div class="ptfy-chat-messages" id="chatMessages">
+      <div class="ptfy-msg system">Patentify IP Strategist — powered by Claude. Ask about whitespaces, patents, competitors, or trigger workflows.</div>
     </div>
-    <div class="ipco-quick-actions" id="quickActions">
-      <button class="ipco-quick-btn" data-msg="Summarize the top 5 whitespace opportunities">Top Whitespaces</button>
-      <button class="ipco-quick-btn" data-msg="What are the latest landscape scan findings?">Landscape Scan</button>
-      <button class="ipco-quick-btn" data-msg="Generate invention hypotheses for the highest-scored whitespace">Generate Ideas</button>
-      <button class="ipco-quick-btn" data-msg="Show competitor analysis for solid-state electrolyte interface">Competitor Intel</button>
+    <div class="ptfy-quick-actions" id="quickActions">
+      <button class="ptfy-quick-btn" data-msg="Summarize the top 5 whitespace opportunities">Top Whitespaces</button>
+      <button class="ptfy-quick-btn" data-msg="What are the latest landscape scan findings?">Landscape Scan</button>
+      <button class="ptfy-quick-btn" data-msg="Generate invention hypotheses for the highest-scored whitespace">Generate Ideas</button>
+      <button class="ptfy-quick-btn" data-msg="Show competitor analysis for solid-state electrolyte interface">Competitor Intel</button>
     </div>
-    <div class="ipco-chat-input-area">
-      <textarea class="ipco-chat-input" id="chatInput" placeholder="Ask about IP strategy, patents, whitespaces..." rows="1"></textarea>
-      <button class="ipco-chat-send" id="chatSendBtn">
+    <div class="ptfy-chat-input-area">
+      <textarea class="ptfy-chat-input" id="chatInput" placeholder="Ask about IP strategy, patents, whitespaces..." rows="1"></textarea>
+      <button class="ptfy-chat-send" id="chatSendBtn">
         <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
       </button>
     </div>
@@ -339,10 +339,10 @@
 
   // Status bar
   const statusBar = document.createElement('div');
-  statusBar.className = 'ipco-status-bar';
+  statusBar.className = 'ptfy-status-bar';
   statusBar.innerHTML = `
-    <div class="ipco-status-pill" id="backendStatus">
-      <span class="ipco-status-dot" id="statusDot"></span>
+    <div class="ptfy-status-pill" id="backendStatus">
+      <span class="ptfy-status-dot" id="statusDot"></span>
       <span id="statusText">Connecting...</span>
     </div>
   `;
@@ -382,7 +382,7 @@
   sendBtn.addEventListener('click', sendMessage);
 
   // Quick action buttons
-  document.querySelectorAll('.ipco-quick-btn').forEach(function(btn) {
+  document.querySelectorAll('.ptfy-quick-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
       chatInput.value = btn.getAttribute('data-msg');
       sendMessage();
@@ -394,11 +394,11 @@
   function addMessage(role, content, meta) {
     var msgs = document.getElementById('chatMessages');
     var div = document.createElement('div');
-    div.className = 'ipco-msg ' + role;
+    div.className = 'ptfy-msg ' + role;
     div.textContent = content;
     if (meta) {
       var metaSpan = document.createElement('div');
-      metaSpan.className = 'ipco-msg-meta';
+      metaSpan.className = 'ptfy-msg-meta';
       metaSpan.textContent = meta;
       div.appendChild(metaSpan);
     }
@@ -410,7 +410,7 @@
   function showTyping() {
     var msgs = document.getElementById('chatMessages');
     var div = document.createElement('div');
-    div.className = 'ipco-typing';
+    div.className = 'ptfy-typing';
     div.id = 'typingIndicator';
     div.innerHTML = '<span></span><span></span><span></span>';
     msgs.appendChild(div);
@@ -482,11 +482,11 @@
     fetch(API + '/api/health')
     .then(function(r) { return r.json(); })
     .then(function(data) {
-      document.getElementById('statusDot').className = 'ipco-status-dot green';
+      document.getElementById('statusDot').className = 'ptfy-status-dot green';
       document.getElementById('statusText').textContent = 'AI Backend Active';
     })
     .catch(function() {
-      document.getElementById('statusDot').className = 'ipco-status-dot red';
+      document.getElementById('statusDot').className = 'ptfy-status-dot red';
       document.getElementById('statusText').textContent = 'Backend Offline';
     });
   }
@@ -504,7 +504,7 @@
   });
 
   /* ── Expose API for iframe communication ── */
-  window.IPCoChat = {
+  window.PatentifyChat = {
     open: function() { chatOpen = true; panel.classList.add('open'); },
     close: function() { chatOpen = false; panel.classList.remove('open'); },
     send: function(msg) { chatInput.value = msg; sendMessage(); },

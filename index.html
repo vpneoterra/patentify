@@ -11,8 +11,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IPCo — IP Whitespace Strategy Platform</title>
-<meta name="description" content="IPCo IP Whitespace Strategy — Interactive Dashboard, Investor Pitch, Patent Lab & AI Command Center">
+<title>Patentify — IP Whitespace Strategy Platform</title>
+<meta name="description" content="Patentify IP Whitespace Strategy — Interactive Dashboard, Investor Pitch, Patent Lab & AI Command Center">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display&display=swap" rel="stylesheet">
@@ -456,7 +456,7 @@ iframe.visible {
         <line x1="13" y1="19" x2="10" y2="22" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
         <line x1="19" y1="19" x2="22" y2="22" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
       </svg>
-      <span class="gate-logo-text">IPCo</span>
+      <span class="gate-logo-text">Patentify</span>
     </div>
     <div class="gate-subtitle">IP Whitespace Strategy Platform<br>Enter access code to continue</div>
     <div class="gate-input-wrap">
@@ -476,7 +476,7 @@ iframe.visible {
   <div class="topbar">
     <div class="topbar-left">
       <a class="logo" href="#">
-        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="IPCo">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Patentify">
           <rect x="2" y="2" width="28" height="28" rx="6" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
           <circle cx="10" cy="10" r="3" fill="currentColor" opacity="0.6"/>
           <circle cx="22" cy="10" r="3" fill="currentColor" opacity="0.6"/>
@@ -488,7 +488,7 @@ iframe.visible {
           <line x1="13" y1="19" x2="10" y2="22" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
           <line x1="19" y1="19" x2="22" y2="22" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
         </svg>
-        <span class="logo-text">IPCo</span>
+        <span class="logo-text">Patentify</span>
       </a>
 
       <span class="logo-divider"></span>
@@ -532,7 +532,7 @@ iframe.visible {
 
   <!-- ─── CONTENT FRAMES ─── -->
   <div class="frame-container">
-    <iframe id="frameInvestor" src="./investor/index.html" class="visible" title="IPCo Business Plan"></iframe>
+    <iframe id="frameInvestor" src="./investor/index.html" class="visible" title="Patentify Business Plan"></iframe>
     <iframe id="frameDashboard" src="./dashboard/index.html" class="hidden" title="IP Strategy Dashboard"></iframe>
     <iframe id="framePatentLab" src="./patent-lab/index.html" class="hidden" title="Patent Ideation Lab"></iframe>
     <iframe id="frameAdmin" src="./admin/index.html" class="hidden" title="AI Command Center"></iframe>
@@ -554,7 +554,7 @@ iframe.visible {
   var eye = document.getElementById('gateEye');
 
   // Check session
-  if (sessionStorage.getItem('ipco_auth') === 'granted') {
+  if (sessionStorage.getItem('ptfy_auth') === 'granted') {
     gate.classList.add('dismissed');
     app.classList.remove('locked');
   } else {
@@ -565,7 +565,7 @@ iframe.visible {
     var val = inp.value.trim();
     var match = val.length === KEY.length && val.split('').every(function(c, i) { return c.charCodeAt(0) === KEY[i]; });
     if (match) {
-      sessionStorage.setItem('ipco_auth', 'granted');
+      sessionStorage.setItem('ptfy_auth', 'granted');
       gate.classList.add('dismissed');
       app.classList.remove('locked');
       err.textContent = '';
@@ -645,8 +645,8 @@ iframe.visible {
     modeLabel.textContent = viewLabels[view];
 
     // Notify chat widget of view change
-    if (window.IPCoChat) {
-      window.IPCoChat.setView(view);
+    if (window.PatentifyChat) {
+      window.PatentifyChat.setView(view);
     }
 
     // When switching to investor, force-reveal all scroll-animated sections
