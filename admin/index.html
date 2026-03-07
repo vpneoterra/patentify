@@ -11,7 +11,7 @@
 -->
 
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://api.anthropic.com; img-src 'self' data:;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://api.anthropic.com https://*.supabase.co; img-src 'self' data:;">
 <link rel="stylesheet" href="../design-tokens.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Patentify Command Center</title>
@@ -725,6 +725,155 @@ body {
   padding: 40px 20px;
   font-size: 13px;
 }
+/* ============================================
+   PLATFORM STATE TAB
+   ============================================ */
+.pstate-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.pstate-kpi {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  text-align: center;
+}
+.pstate-kpi-val {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.pstate-kpi-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.pstate-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.pstate-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pstate-section-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+.pstate-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.pstate-action-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+}
+.pstate-action-card h4 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.pstate-action-card p {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+.pstate-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pstate-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.pstate-checkbox input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent);
+}
+.pstate-status {
+  margin-top: 10px;
+  font-size: 11px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  line-height: 1.5;
+}
+.pstate-status.success { background: rgba(34,197,94,0.08); color: var(--accent-green); border: 1px solid rgba(34,197,94,0.2); }
+.pstate-status.error { background: rgba(239,68,68,0.08); color: var(--accent-red); border: 1px solid rgba(239,68,68,0.2); }
+.pstate-status.info { background: rgba(37,99,235,0.08); color: var(--accent-blue); border: 1px solid rgba(37,99,235,0.2); }
+.pstate-cloud-config {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+}
+.pstate-sync-status {
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-left: 4px;
+}
+.pstate-sync-status.connected { color: var(--accent-green); }
+.pstate-sync-status.syncing { color: var(--accent-amber); }
+.pstate-sync-status.error { color: var(--accent-red); }
+.pstate-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.pstate-table th {
+  text-align: left;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+}
+.pstate-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: middle;
+}
+.pstate-table tr:last-child td { border-bottom: none; }
+.pstate-table tr:hover td { background: var(--bg-hover); }
+.pstate-cred-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.pstate-cred-status.configured { background: rgba(34,197,94,0.10); color: var(--accent-green); }
+.pstate-cred-status.missing { background: rgba(239,68,68,0.08); color: var(--accent-red); }
+.pstate-cred-status.partial { background: rgba(212,160,23,0.10); color: var(--accent-amber); }
+
 .errlog-empty svg {
   display: block;
   margin: 0 auto 12px;
@@ -1815,6 +1964,10 @@ tr:hover td { background: rgba(255,255,255,0.02); }
         <span class="nav-item-label">Error Log</span>
         <span class="subtab-count zero" id="errlogBadge" style="margin-left:auto">0</span>
       </button>
+      <button class="nav-item" data-tab="platform-state" onclick="switchTab('platform-state')">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h12v3H4zM4 9h12v3H4zM4 14h12v3H4z"/><circle cx="6" cy="5.5" r="0.75" fill="currentColor"/><circle cx="6" cy="10.5" r="0.75" fill="currentColor"/><circle cx="6" cy="15.5" r="0.75" fill="currentColor"/></svg>
+        <span class="nav-item-label">Platform State</span>
+      </button>
     </nav>
 
     <div class="sidebar-footer">
@@ -2486,6 +2639,186 @@ tr:hover td { background: rgba(255,255,255,0.02); }
         </div>
       </div>
 
+      <!-- ==================
+           TAB 9: PLATFORM STATE
+           ================== -->
+      <div class="tab-panel" id="panel-platform-state">
+
+        <!-- Data Integrity Summary -->
+        <div class="pstate-summary" id="pstateSummary">
+          <div class="pstate-kpi">
+            <div class="pstate-kpi-val" id="psKpiStorageEngine">—</div>
+            <div class="pstate-kpi-label">Storage Engine</div>
+          </div>
+          <div class="pstate-kpi">
+            <div class="pstate-kpi-val" id="psKpiTotalRecords">—</div>
+            <div class="pstate-kpi-label">Total Records</div>
+          </div>
+          <div class="pstate-kpi">
+            <div class="pstate-kpi-val" id="psKpiStorageUsed">—</div>
+            <div class="pstate-kpi-label">Storage Used</div>
+          </div>
+          <div class="pstate-kpi">
+            <div class="pstate-kpi-val" id="psKpiLastBackup">Never</div>
+            <div class="pstate-kpi-label">Last Backup</div>
+          </div>
+        </div>
+
+        <!-- Tier 1: Local Resilience -->
+        <div class="pstate-section">
+          <h3 class="pstate-section-title">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10v7h14v-7M10 3v10M7 6l3-3 3 3"/></svg>
+            Tier 1 — Local Backup &amp; Restore
+          </h3>
+          <p class="pstate-section-desc">Export all platform data (portfolio, CII scores, workflow configs, API usage, error log, settings) as a single JSON snapshot. Credentials are redacted by default.</p>
+
+          <div class="pstate-actions">
+            <div class="pstate-action-card">
+              <h4>Download Platform State</h4>
+              <p>Serialize the entire platform state to a downloadable JSON file.</p>
+              <div class="pstate-options">
+                <label class="pstate-checkbox">
+                  <input type="checkbox" id="psIncludeCredentials">
+                  <span>Include API key (unredacted)</span>
+                </label>
+                <label class="pstate-checkbox">
+                  <input type="checkbox" id="psIncludeUsage" checked>
+                  <span>Include API usage log</span>
+                </label>
+                <label class="pstate-checkbox">
+                  <input type="checkbox" id="psIncludeErrors" checked>
+                  <span>Include error log</span>
+                </label>
+              </div>
+              <button class="btn btn-primary" onclick="downloadPlatformState()" style="margin-top:12px">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10v3h10v-3M8 2v8M5 7l3 3 3-3"/></svg>
+                Download State (.json)
+              </button>
+            </div>
+
+            <div class="pstate-action-card">
+              <h4>Restore Platform State</h4>
+              <p>Load a previously exported JSON file to restore all data. This overwrites current state.</p>
+              <div class="pstate-options">
+                <label class="pstate-checkbox">
+                  <input type="checkbox" id="psRestoreMerge">
+                  <span>Merge mode (append logs, keep newer records)</span>
+                </label>
+              </div>
+              <input type="file" id="psRestoreFile" accept=".json" style="display:none" onchange="handleRestoreFile(event)">
+              <button class="btn btn-secondary" onclick="document.getElementById('psRestoreFile').click()" style="margin-top:12px">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6V3h10v3M8 14V6M5 9l3-3 3 3"/></svg>
+                Restore from File
+              </button>
+              <div id="psRestoreStatus" class="pstate-status" style="display:none"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tier 2: Cloud Sync -->
+        <div class="pstate-section">
+          <h3 class="pstate-section-title">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 13a4 4 0 01-.88-7.9A6 6 0 0115.88 6 4.5 4.5 0 0116 14H5z"/></svg>
+            Tier 2 — Cloud Persistence (Supabase)
+          </h3>
+          <p class="pstate-section-desc">Connect to a Supabase project for automatic cloud sync. Data is synced on every save and can be restored from any device.</p>
+
+          <div class="pstate-cloud-config">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label">Supabase Project URL</label>
+                <input class="form-input" id="psSupabaseUrl" type="url" placeholder="https://xyz.supabase.co" style="font-size:12px">
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label">Supabase Anon Key</label>
+                <input class="form-input" id="psSupabaseKey" type="password" placeholder="eyJhbGci..." style="font-size:12px;font-family:monospace">
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+              <button class="btn btn-primary btn-sm" onclick="saveSupabaseConfig()">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 5L6.5 11.5 3 8"/></svg>
+                Save &amp; Connect
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="syncToCloud()" id="psSyncBtn" disabled>
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 0111-3M14 8a6 6 0 01-11 3"/></svg>
+                Sync Now
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="restoreFromCloud()" id="psCloudRestoreBtn" disabled>
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6V3h10v3M8 14V6M5 9l3-3 3 3"/></svg>
+                Restore from Cloud
+              </button>
+              <span class="pstate-sync-status" id="psSyncStatus">Not connected</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Credential Management -->
+        <div class="pstate-section">
+          <h3 class="pstate-section-title">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l2 2-7.6 7.6a5.5 5.5 0 11-2-2L12 2z"/><circle cx="6" cy="14" r="2"/></svg>
+            Credential Management
+          </h3>
+          <p class="pstate-section-desc">Manage sensitive keys. For production, store credentials as GitHub Repository Secrets and inject them via GitHub Pages environment variables at build time.</p>
+
+          <div class="pstate-cred-table">
+            <table class="pstate-table">
+              <thead>
+                <tr>
+                  <th>Credential</th>
+                  <th>Storage</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="psCredBody">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pstate-github-info" style="margin-top:16px">
+            <h4 style="font-size:12px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+              GitHub Secrets Integration
+            </h4>
+            <p style="font-size:11px;color:var(--text-muted);line-height:1.6;margin-bottom:8px">
+              For the <code>vpneoterra/fusion-ip-whitespaces</code> repo, add secrets via <strong>Settings → Secrets → Actions</strong>.
+              The deploy workflow injects them as <code>window.PATENTIFY_CONFIG</code> variables at build time.
+            </p>
+            <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-family:monospace;font-size:11px;color:var(--text-muted);line-height:1.6">
+              <span style="color:var(--accent-amber)">Repository Secrets:</span><br>
+              ANTHROPIC_API_KEY → <code>sk-ant-...</code><br>
+              SUPABASE_URL → <code>https://xyz.supabase.co</code><br>
+              SUPABASE_ANON_KEY → <code>eyJhbGci...</code><br><br>
+              <span style="color:var(--accent-amber)">In deploy.yml:</span><br>
+              <code>echo "window.PATENTIFY_CONFIG={ANTHROPIC_API_KEY:'${{secrets.ANTHROPIC_API_KEY}}'};" > env.local.js</code>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Store Inventory -->
+        <div class="pstate-section">
+          <h3 class="pstate-section-title">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 5h14M3 10h14M3 15h14"/><circle cx="6" cy="5" r="1" fill="currentColor"/><circle cx="6" cy="10" r="1" fill="currentColor"/><circle cx="6" cy="15" r="1" fill="currentColor"/></svg>
+            Data Store Inventory
+          </h3>
+          <table class="pstate-table">
+            <thead>
+              <tr>
+                <th>Store</th>
+                <th>Records</th>
+                <th>Size (est.)</th>
+                <th>Storage</th>
+                <th>Backup Status</th>
+              </tr>
+            </thead>
+            <tbody id="psInventoryBody">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
 
     <footer class="page-footer">
@@ -2780,6 +3113,8 @@ function scoreClass(score) {
 }
 
 async function apiFetch(path, options) {
+  /* No backend API configured — return empty data so tabs degrade gracefully */
+  if (!API) return {};
   try {
     var resp = await fetch(API + path, options);
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
@@ -2802,7 +3137,8 @@ var tabTitles = {
   'collaterals': 'Patent Collaterals',
   'api-usage': 'API Usage',
   'activity': 'Activity Log',
-  'error-log': 'Error Log'
+  'error-log': 'Error Log',
+  'platform-state': 'Platform State'
 };
 
 function switchTab(tab) {
@@ -2827,6 +3163,7 @@ function switchTab(tab) {
   if (tab === 'api-usage') loadApiUsageDashboard();
   if (tab === 'activity') { loadActivity(); startActivityRefresh(); }
   if (tab === 'error-log') renderErrorLog();
+  if (tab === 'platform-state') loadPlatformStateTab();
   if (tab !== 'activity') stopActivityRefresh();
 }
 
@@ -6121,6 +6458,755 @@ function exportUsageCSV() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
   toast('Usage data exported as CSV', 'success');
+}
+
+
+/* ============================================
+   PLATFORM STATE MANAGER
+   IndexedDB + localStorage fallback,
+   full state export/import, Supabase cloud
+   sync, credential management.
+   ============================================ */
+var PlatformState = (function() {
+  'use strict';
+
+  var DB_NAME = 'patentify_platform';
+  var DB_VERSION = 1;
+  var STORE_NAME = 'state';
+  var SUPABASE_CONFIG_KEY = 'patentify_supabase_config';
+  var LAST_BACKUP_KEY = 'patentify_last_backup';
+  var db = null;
+  var useIDB = false;
+
+  /* ── IndexedDB init ── */
+  function initDB() {
+    return new Promise(function(resolve) {
+      if (!window.indexedDB) { resolve(false); return; }
+      try {
+        var req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = function(e) {
+          var d = e.target.result;
+          if (!d.objectStoreNames.contains(STORE_NAME)) {
+            d.createObjectStore(STORE_NAME);
+          }
+        };
+        req.onsuccess = function(e) {
+          db = e.target.result;
+          useIDB = true;
+          resolve(true);
+        };
+        req.onerror = function() { resolve(false); };
+      } catch(ex) { resolve(false); }
+    });
+  }
+
+  function idbGet(key) {
+    return new Promise(function(resolve) {
+      if (!db) { resolve(null); return; }
+      try {
+        var tx = db.transaction(STORE_NAME, 'readonly');
+        var req = tx.objectStore(STORE_NAME).get(key);
+        req.onsuccess = function() { resolve(req.result !== undefined ? req.result : null); };
+        req.onerror = function() { resolve(null); };
+      } catch(e) { resolve(null); }
+    });
+  }
+
+  function idbSet(key, val) {
+    return new Promise(function(resolve) {
+      if (!db) { resolve(false); return; }
+      try {
+        var tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).put(val, key);
+        tx.oncomplete = function() { resolve(true); };
+        tx.onerror = function() { resolve(false); };
+      } catch(e) { resolve(false); }
+    });
+  }
+
+  function idbDelete(key) {
+    return new Promise(function(resolve) {
+      if (!db) { resolve(false); return; }
+      try {
+        var tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).delete(key);
+        tx.oncomplete = function() { resolve(true); };
+        tx.onerror = function() { resolve(false); };
+      } catch(e) { resolve(false); }
+    });
+  }
+
+  function idbGetAll() {
+    return new Promise(function(resolve) {
+      if (!db) { resolve({}); return; }
+      try {
+        var tx = db.transaction(STORE_NAME, 'readonly');
+        var store = tx.objectStore(STORE_NAME);
+        var req = store.openCursor();
+        var result = {};
+        req.onsuccess = function(e) {
+          var cursor = e.target.result;
+          if (cursor) {
+            result[cursor.key] = cursor.value;
+            cursor.continue();
+          } else {
+            resolve(result);
+          }
+        };
+        req.onerror = function() { resolve({}); };
+      } catch(e) { resolve({}); }
+    });
+  }
+
+  /* ── Dual-layer storage (IDB primary, localStorage fallback) ── */
+  async function storeSet(key, val) {
+    if (useIDB) await idbSet(key, val);
+    // Always mirror to localStorage as fallback
+    try { localStorage.setItem('ps_' + key, JSON.stringify(val)); } catch(e) {}
+  }
+
+  async function storeGet(key) {
+    if (useIDB) {
+      var v = await idbGet(key);
+      if (v !== null) return v;
+    }
+    try {
+      var raw = localStorage.getItem('ps_' + key);
+      return raw ? JSON.parse(raw) : null;
+    } catch(e) { return null; }
+  }
+
+  /* ── Collect full platform state snapshot ── */
+  function collectState(options) {
+    options = options || {};
+    var state = {
+      _meta: {
+        version: '1.0',
+        exportedAt: new Date().toISOString(),
+        platform: 'IP Strategy Platform',
+        platformContextVersion: (window.PLATFORM_CONTEXT && window.PLATFORM_CONTEXT.version) || 'unknown',
+        skillRegistryVersion: (window.SKILL_REGISTRY && window.SKILL_REGISTRY.version) || 'unknown',
+        storageEngine: useIDB ? 'IndexedDB + localStorage' : 'localStorage'
+      },
+
+      /* Canonical taxonomy */
+      canonical: window.PATENTIFY_CANONICAL || null,
+
+      /* CII scores for all 105 ideas */
+      ciisLookup: (typeof CIIS_LOOKUP !== 'undefined') ? CIIS_LOOKUP : null,
+
+      /* CPC patent data */
+      cpcPatentData: (typeof CPC_PATENT_DATA !== 'undefined') ? CPC_PATENT_DATA : null,
+
+      /* Pipeline stages definition */
+      stages: (typeof STAGES !== 'undefined') ? STAGES : null,
+
+      /* Whitespace Discovery Workflow */
+      whitespaceDiscovery: (typeof WHITESPACE_DISCOVERY_WORKFLOW !== 'undefined') ? WHITESPACE_DISCOVERY_WORKFLOW : null,
+
+      /* Skills metadata (not full prompts — too large and already in env.js) */
+      skillRegistryMap: window.SKILL_REGISTRY ? window.SKILL_REGISTRY.stepSkills : null,
+
+      /* Agent settings from DOM */
+      agentSettings: captureAgentSettings(),
+
+      /* Credentials (redacted by default) */
+      credentials: {
+        anthropicApiKey: options.includeCredentials
+          ? (PatentifyEnv.getApiKey() || '')
+          : redactKey(PatentifyEnv.getApiKey()),
+        supabaseConfig: getSupabaseConfig()
+      }
+    };
+
+    /* API usage log */
+    if (options.includeUsage !== false) {
+      state.apiUsageLog = PatentifyUsage.getLog();
+    }
+
+    /* Error log */
+    if (options.includeErrors !== false) {
+      state.errorLog = PatentifyErrorLog.getLog();
+    }
+
+    return state;
+  }
+
+  function captureAgentSettings() {
+    try {
+      return {
+        personality: document.getElementById('cfg-personality') ? document.getElementById('cfg-personality').value : '',
+        systemPrompt: document.getElementById('cfg-system-prompt') ? document.getElementById('cfg-system-prompt').value : '',
+        model: document.getElementById('cfg-model') ? document.getElementById('cfg-model').value : '',
+        style: document.getElementById('cfg-style') ? document.getElementById('cfg-style').value : '',
+        temperature: document.getElementById('cfg-temperature') ? document.getElementById('cfg-temperature').value : '0.3',
+        maxTokens: document.getElementById('cfg-max-tokens') ? document.getElementById('cfg-max-tokens').value : '4096',
+        domain: document.getElementById('cfg-domain') ? document.getElementById('cfg-domain').value : 'all',
+        scoringThreshold: document.getElementById('cfg-scoring-threshold') ? document.getElementById('cfg-scoring-threshold').value : '7.0',
+        ftoReject: document.getElementById('cfg-fto-reject') ? document.getElementById('cfg-fto-reject').value : 'red',
+        autoResearch: document.getElementById('cfg-auto-research') ? document.getElementById('cfg-auto-research').checked : true,
+        theme: document.documentElement.getAttribute('data-theme') || 'dark'
+      };
+    } catch(e) { return {}; }
+  }
+
+  function redactKey(key) {
+    if (!key || key.length < 12) return '[NOT SET]';
+    return key.substring(0, 10) + '...' + key.substring(key.length - 4) + ' [REDACTED]';
+  }
+
+  /* ── Restore state from JSON ── */
+  function restoreState(state, options) {
+    options = options || {};
+    var merge = options.merge || false;
+    var report = { restored: [], skipped: [], errors: [] };
+
+    try {
+      /* Validate structure */
+      if (!state || !state._meta || !state._meta.version) {
+        return { success: false, error: 'Invalid state file: missing metadata' };
+      }
+
+      /* Restore API usage log */
+      if (state.apiUsageLog && Array.isArray(state.apiUsageLog)) {
+        if (merge) {
+          var existing = PatentifyUsage.getLog();
+          var existingTs = {};
+          existing.forEach(function(e) { existingTs[e.ts] = true; });
+          var newEntries = state.apiUsageLog.filter(function(e) { return !existingTs[e.ts]; });
+          var combined = existing.concat(newEntries);
+          combined.sort(function(a, b) { return a.ts < b.ts ? -1 : 1; });
+          // Directly write to localStorage to bypass individual record calls
+          try { localStorage.setItem('patentify_usage', JSON.stringify(combined)); } catch(e) {}
+          report.restored.push('API usage log (' + newEntries.length + ' new entries merged)');
+        } else {
+          try { localStorage.setItem('patentify_usage', JSON.stringify(state.apiUsageLog)); } catch(e) {}
+          report.restored.push('API usage log (' + state.apiUsageLog.length + ' entries)');
+        }
+      }
+
+      /* Restore error log */
+      if (state.errorLog && Array.isArray(state.errorLog)) {
+        if (merge) {
+          var existErr = PatentifyErrorLog.getLog();
+          var existErrIds = {};
+          existErr.forEach(function(e) { existErrIds[e.id] = true; });
+          var newErr = state.errorLog.filter(function(e) { return !existErrIds[e.id]; });
+          var combinedErr = existErr.concat(newErr);
+          combinedErr.sort(function(a, b) { return a.ts < b.ts ? -1 : 1; });
+          try { localStorage.setItem('patentify_error_log', JSON.stringify(combinedErr)); } catch(e) {}
+          report.restored.push('Error log (' + newErr.length + ' new entries merged)');
+        } else {
+          try { localStorage.setItem('patentify_error_log', JSON.stringify(state.errorLog)); } catch(e) {}
+          report.restored.push('Error log (' + state.errorLog.length + ' entries)');
+        }
+      }
+
+      /* Restore credentials (only unredacted) */
+      if (state.credentials && state.credentials.anthropicApiKey) {
+        var key = state.credentials.anthropicApiKey;
+        if (key && !key.includes('[REDACTED]') && !key.includes('[NOT SET]')) {
+          PatentifyEnv.setApiKey(key);
+          report.restored.push('Anthropic API key');
+        } else {
+          report.skipped.push('API key (redacted in export)');
+        }
+      }
+
+      /* Restore Supabase config */
+      if (state.credentials && state.credentials.supabaseConfig) {
+        var sc = state.credentials.supabaseConfig;
+        if (sc.url && sc.anonKey) {
+          saveSupabaseConfigValues(sc.url, sc.anonKey);
+          report.restored.push('Supabase config');
+        }
+      }
+
+      /* Restore agent settings to form fields */
+      if (state.agentSettings) {
+        restoreAgentSettings(state.agentSettings);
+        report.restored.push('Agent settings');
+      }
+
+      /* Note: hardcoded data (CIIS_LOOKUP, CPC_PATENT_DATA, STAGES, etc.) is
+         embedded in the source HTML/JS and cannot be overwritten at runtime
+         in a static site context. The export includes them for completeness
+         and cross-device reference, but restoration is skipped. */
+      if (state.ciisLookup) report.skipped.push('CIIS lookup (embedded in source)');
+      if (state.cpcPatentData) report.skipped.push('CPC patent data (embedded in source)');
+      if (state.canonical) report.skipped.push('Canonical taxonomy (embedded in source)');
+
+      return { success: true, report: report };
+    } catch(err) {
+      return { success: false, error: err.message };
+    }
+  }
+
+  function restoreAgentSettings(settings) {
+    if (!settings) return;
+    try {
+      if (settings.personality && document.getElementById('cfg-personality')) document.getElementById('cfg-personality').value = settings.personality;
+      if (settings.systemPrompt && document.getElementById('cfg-system-prompt')) document.getElementById('cfg-system-prompt').value = settings.systemPrompt;
+      if (settings.model && document.getElementById('cfg-model')) document.getElementById('cfg-model').value = settings.model;
+      if (settings.style && document.getElementById('cfg-style')) document.getElementById('cfg-style').value = settings.style;
+      if (settings.temperature && document.getElementById('cfg-temperature')) {
+        document.getElementById('cfg-temperature').value = settings.temperature;
+        if (document.getElementById('temp-val')) document.getElementById('temp-val').textContent = settings.temperature;
+      }
+      if (settings.maxTokens && document.getElementById('cfg-max-tokens')) document.getElementById('cfg-max-tokens').value = settings.maxTokens;
+      if (settings.domain && document.getElementById('cfg-domain')) document.getElementById('cfg-domain').value = settings.domain;
+      if (settings.scoringThreshold && document.getElementById('cfg-scoring-threshold')) document.getElementById('cfg-scoring-threshold').value = settings.scoringThreshold;
+      if (settings.ftoReject && document.getElementById('cfg-fto-reject')) document.getElementById('cfg-fto-reject').value = settings.ftoReject;
+      if (typeof settings.autoResearch === 'boolean' && document.getElementById('cfg-auto-research')) document.getElementById('cfg-auto-research').checked = settings.autoResearch;
+      if (settings.theme) document.documentElement.setAttribute('data-theme', settings.theme);
+    } catch(e) {}
+  }
+
+  /* ── Supabase config ── */
+  function getSupabaseConfig() {
+    // 1. Check env.local.js / GitHub Secrets injection
+    var cfg = window.PATENTIFY_CONFIG || {};
+    if (cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY) {
+      return { url: cfg.SUPABASE_URL, anonKey: cfg.SUPABASE_ANON_KEY };
+    }
+    // 2. Check localStorage (set via Platform State UI)
+    try {
+      var raw = localStorage.getItem(SUPABASE_CONFIG_KEY);
+      return raw ? JSON.parse(raw) : { url: '', anonKey: '' };
+    } catch(e) { return { url: '', anonKey: '' }; }
+  }
+
+  function saveSupabaseConfigValues(url, key) {
+    try { localStorage.setItem(SUPABASE_CONFIG_KEY, JSON.stringify({ url: url, anonKey: key })); } catch(e) {}
+  }
+
+  /* ── Supabase cloud sync ── */
+  async function syncToSupabase() {
+    var config = getSupabaseConfig();
+    if (!config.url || !config.anonKey) throw new Error('Supabase not configured');
+
+    var state = collectState({ includeCredentials: false, includeUsage: true, includeErrors: true });
+    var payload = {
+      id: 'platform-state-singleton',
+      updated_at: new Date().toISOString(),
+      state_json: state
+    };
+
+    var resp = await fetch(config.url + '/rest/v1/platform_state', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': config.anonKey,
+        'Authorization': 'Bearer ' + config.anonKey,
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!resp.ok) {
+      var errBody = await resp.text();
+      throw new Error('Supabase sync failed: HTTP ' + resp.status + ' — ' + errBody);
+    }
+
+    setLastBackup(new Date().toISOString());
+    return { success: true, ts: new Date().toISOString() };
+  }
+
+  async function restoreFromSupabase() {
+    var config = getSupabaseConfig();
+    if (!config.url || !config.anonKey) throw new Error('Supabase not configured');
+
+    var resp = await fetch(config.url + '/rest/v1/platform_state?id=eq.platform-state-singleton&select=state_json', {
+      headers: {
+        'apikey': config.anonKey,
+        'Authorization': 'Bearer ' + config.anonKey
+      }
+    });
+
+    if (!resp.ok) throw new Error('Supabase fetch failed: HTTP ' + resp.status);
+    var rows = await resp.json();
+    if (!rows || rows.length === 0) throw new Error('No cloud backup found');
+
+    return rows[0].state_json;
+  }
+
+  /* ── Backup timestamp ── */
+  function getLastBackup() {
+    try { return localStorage.getItem(LAST_BACKUP_KEY) || null; } catch(e) { return null; }
+  }
+
+  function setLastBackup(ts) {
+    try { localStorage.setItem(LAST_BACKUP_KEY, ts); } catch(e) {}
+  }
+
+  /* ── Storage metrics ── */
+  function estimateStorageSize() {
+    var total = 0;
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        var val = localStorage.getItem(key);
+        total += (key.length + val.length) * 2; // UTF-16
+      }
+    } catch(e) {}
+    return total;
+  }
+
+  function formatBytes(bytes) {
+    if (bytes === 0) return '0 B';
+    var k = 1024;
+    var sizes = ['B', 'KB', 'MB'];
+    var i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  }
+
+  /* ── Data inventory ── */
+  function getDataInventory() {
+    var items = [];
+
+    /* Canonical taxonomy */
+    var canon = window.PATENTIFY_CANONICAL;
+    items.push({
+      store: 'Canonical Taxonomy',
+      records: canon ? canon.whitespaces.length + ' whitespaces, ' + canon.totalIdeas + ' ideas' : '0',
+      size: canon ? formatBytes(JSON.stringify(canon).length * 2) : '0 B',
+      storage: 'Embedded JS',
+      backed: true
+    });
+
+    /* CIIS lookup */
+    var ciis = (typeof CIIS_LOOKUP !== 'undefined') ? CIIS_LOOKUP : null;
+    var ciisCount = ciis ? Object.keys(ciis).length : 0;
+    items.push({
+      store: 'CII Scores (CIIS_LOOKUP)',
+      records: ciisCount + ' ideas',
+      size: ciis ? formatBytes(JSON.stringify(ciis).length * 2) : '0 B',
+      storage: 'Embedded JS',
+      backed: true
+    });
+
+    /* CPC patent data */
+    var cpc = (typeof CPC_PATENT_DATA !== 'undefined') ? CPC_PATENT_DATA : null;
+    var cpcCount = cpc ? Object.keys(cpc).length : 0;
+    items.push({
+      store: 'CPC Patent Data',
+      records: cpcCount + ' whitespaces',
+      size: cpc ? formatBytes(JSON.stringify(cpc).length * 2) : '0 B',
+      storage: 'Embedded JS',
+      backed: true
+    });
+
+    /* Workflow definitions */
+    var wf = (typeof WHITESPACE_DISCOVERY_WORKFLOW !== 'undefined') ? WHITESPACE_DISCOVERY_WORKFLOW : null;
+    items.push({
+      store: 'Workflow Definitions',
+      records: wf ? (wf.steps ? wf.steps.length + ' steps' : '1 workflow') : '0',
+      size: wf ? formatBytes(JSON.stringify(wf).length * 2) : '0 B',
+      storage: 'Embedded JS',
+      backed: true
+    });
+
+    /* Skills (env.js) */
+    var skillCount = window.SKILL_REGISTRY ? Object.keys(window.SKILL_REGISTRY.skills).length : 0;
+    items.push({
+      store: 'Skill Registry',
+      records: skillCount + ' skills',
+      size: '~30 KB',
+      storage: 'env.js',
+      backed: true
+    });
+
+    /* API usage log */
+    var usageLog = PatentifyUsage.getLog();
+    items.push({
+      store: 'API Usage Log',
+      records: usageLog.length + ' entries',
+      size: formatBytes(JSON.stringify(usageLog).length * 2),
+      storage: 'localStorage',
+      backed: true
+    });
+
+    /* Error log */
+    var errLog = PatentifyErrorLog.getLog();
+    items.push({
+      store: 'Error Log',
+      records: errLog.length + ' entries',
+      size: formatBytes(JSON.stringify(errLog).length * 2),
+      storage: 'localStorage',
+      backed: true
+    });
+
+    /* Credentials */
+    items.push({
+      store: 'Credentials',
+      records: PatentifyEnv.hasApiKey() ? '1 key configured' : '0 keys',
+      size: '< 1 KB',
+      storage: 'localStorage / env.local.js',
+      backed: true
+    });
+
+    return items;
+  }
+
+  return {
+    initDB: initDB,
+    collectState: collectState,
+    restoreState: restoreState,
+    syncToSupabase: syncToSupabase,
+    restoreFromSupabase: restoreFromSupabase,
+    getSupabaseConfig: getSupabaseConfig,
+    saveSupabaseConfigValues: saveSupabaseConfigValues,
+    getLastBackup: getLastBackup,
+    setLastBackup: setLastBackup,
+    estimateStorageSize: estimateStorageSize,
+    formatBytes: formatBytes,
+    getDataInventory: getDataInventory,
+    useIDB: function() { return useIDB; }
+  };
+})();
+
+/* Initialize IndexedDB on load */
+PlatformState.initDB().then(function(ok) {
+  console.log('[PlatformState] IndexedDB: ' + (ok ? 'active' : 'unavailable, using localStorage fallback'));
+});
+
+
+/* ============================================
+   PLATFORM STATE TAB — UI FUNCTIONS
+   ============================================ */
+function loadPlatformStateTab() {
+  /* KPIs */
+  document.getElementById('psKpiStorageEngine').textContent = PlatformState.useIDB() ? 'IndexedDB' : 'localStorage';
+
+  var inventory = PlatformState.getDataInventory();
+  var totalRecords = 0;
+  inventory.forEach(function(item) {
+    var nums = item.records.match(/\d+/);
+    if (nums) totalRecords += parseInt(nums[0]);
+  });
+  document.getElementById('psKpiTotalRecords').textContent = totalRecords.toLocaleString();
+  document.getElementById('psKpiStorageUsed').textContent = PlatformState.formatBytes(PlatformState.estimateStorageSize());
+
+  var lastBackup = PlatformState.getLastBackup();
+  document.getElementById('psKpiLastBackup').textContent = lastBackup
+    ? new Date(lastBackup).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+    : 'Never';
+
+  /* Supabase config */
+  var sbConfig = PlatformState.getSupabaseConfig();
+  if (sbConfig.url) document.getElementById('psSupabaseUrl').value = sbConfig.url;
+  if (sbConfig.anonKey) document.getElementById('psSupabaseKey').value = sbConfig.anonKey;
+  var connected = !!(sbConfig.url && sbConfig.anonKey);
+  document.getElementById('psSyncBtn').disabled = !connected;
+  document.getElementById('psCloudRestoreBtn').disabled = !connected;
+  var statusEl = document.getElementById('psSyncStatus');
+  statusEl.textContent = connected ? 'Connected' : 'Not connected';
+  statusEl.className = 'pstate-sync-status' + (connected ? ' connected' : '');
+
+  /* Credential table */
+  renderCredentialTable();
+
+  /* Data inventory table */
+  renderInventoryTable(inventory);
+}
+
+function renderCredentialTable() {
+  var tbody = document.getElementById('psCredBody');
+  var apiKey = PatentifyEnv.getApiKey();
+  var sbConfig = PlatformState.getSupabaseConfig();
+
+  var creds = [
+    {
+      name: 'Anthropic API Key',
+      storage: 'localStorage / env.local.js',
+      configured: !!(apiKey && apiKey.length > 10),
+      preview: apiKey ? apiKey.substring(0, 10) + '...' : '',
+      keyId: 'anthropic'
+    },
+    {
+      name: 'Supabase URL',
+      storage: 'localStorage',
+      configured: !!sbConfig.url,
+      preview: sbConfig.url || '',
+      keyId: 'supabase-url'
+    },
+    {
+      name: 'Supabase Anon Key',
+      storage: 'localStorage',
+      configured: !!sbConfig.anonKey,
+      preview: sbConfig.anonKey ? sbConfig.anonKey.substring(0, 10) + '...' : '',
+      keyId: 'supabase-key'
+    }
+  ];
+
+  var html = '';
+  creds.forEach(function(c) {
+    var statusCls = c.configured ? 'configured' : 'missing';
+    var statusText = c.configured ? '\u2713 Configured' : '\u2717 Not Set';
+    html += '<tr>' +
+      '<td style="font-weight:500">' + escapeHtml(c.name) + '</td>' +
+      '<td style="font-size:11px;color:var(--text-muted)">' + escapeHtml(c.storage) + '</td>' +
+      '<td><span class="pstate-cred-status ' + statusCls + '">' + statusText + '</span></td>' +
+      '<td>' +
+        (c.configured ? '<code style="font-size:10px;color:var(--text-faint)">' + escapeHtml(c.preview) + '</code>' : '<span style="font-size:11px;color:var(--text-faint)">\u2014</span>') +
+      '</td>' +
+    '</tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+function renderInventoryTable(inventory) {
+  var tbody = document.getElementById('psInventoryBody');
+  var html = '';
+  inventory.forEach(function(item) {
+    html += '<tr>' +
+      '<td style="font-weight:500">' + escapeHtml(item.store) + '</td>' +
+      '<td style="font-variant-numeric:tabular-nums">' + escapeHtml(item.records) + '</td>' +
+      '<td style="font-variant-numeric:tabular-nums;color:var(--text-muted)">' + escapeHtml(item.size) + '</td>' +
+      '<td><code style="font-size:10px">' + escapeHtml(item.storage) + '</code></td>' +
+      '<td><span class="pstate-cred-status configured">\u2713 Included</span></td>' +
+    '</tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+
+/* ── Download Platform State ── */
+function downloadPlatformState() {
+  var includeCredentials = document.getElementById('psIncludeCredentials').checked;
+  var includeUsage = document.getElementById('psIncludeUsage').checked;
+  var includeErrors = document.getElementById('psIncludeErrors').checked;
+
+  var state = PlatformState.collectState({
+    includeCredentials: includeCredentials,
+    includeUsage: includeUsage,
+    includeErrors: includeErrors
+  });
+
+  var blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'platform-state-' + new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  PlatformState.setLastBackup(new Date().toISOString());
+  toast('Platform state downloaded' + (includeCredentials ? ' (with credentials)' : ' (credentials redacted)'), 'success');
+  loadPlatformStateTab();
+}
+
+
+/* ── Restore Platform State ── */
+function handleRestoreFile(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+
+  var statusEl = document.getElementById('psRestoreStatus');
+  statusEl.style.display = 'block';
+  statusEl.className = 'pstate-status info';
+  statusEl.textContent = 'Reading file...';
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var state = JSON.parse(e.target.result);
+      var merge = document.getElementById('psRestoreMerge').checked;
+
+      if (!confirm('This will ' + (merge ? 'merge with' : 'overwrite') + ' your current platform state. Continue?')) {
+        statusEl.style.display = 'none';
+        return;
+      }
+
+      var result = PlatformState.restoreState(state, { merge: merge });
+
+      if (result.success) {
+        statusEl.className = 'pstate-status success';
+        var msg = 'Restore complete.\n';
+        if (result.report.restored.length) msg += 'Restored: ' + result.report.restored.join(', ') + '.\n';
+        if (result.report.skipped.length) msg += 'Skipped: ' + result.report.skipped.join(', ') + '.';
+        statusEl.textContent = msg;
+        toast('Platform state restored successfully', 'success');
+        loadPlatformStateTab();
+      } else {
+        statusEl.className = 'pstate-status error';
+        statusEl.textContent = 'Restore failed: ' + result.error;
+        toast('Restore failed: ' + result.error, 'error');
+      }
+    } catch(err) {
+      statusEl.className = 'pstate-status error';
+      statusEl.textContent = 'Invalid JSON file: ' + err.message;
+      toast('Invalid file: ' + err.message, 'error');
+    }
+  };
+  reader.readAsText(file);
+  // Reset input so same file can be re-selected
+  event.target.value = '';
+}
+
+
+/* ── Supabase Cloud Sync ── */
+function saveSupabaseConfig() {
+  var url = document.getElementById('psSupabaseUrl').value.trim();
+  var key = document.getElementById('psSupabaseKey').value.trim();
+
+  if (!url || !key) {
+    toast('Both Supabase URL and Anon Key are required', 'error');
+    return;
+  }
+
+  PlatformState.saveSupabaseConfigValues(url, key);
+  toast('Supabase config saved', 'success');
+  loadPlatformStateTab();
+}
+
+async function syncToCloud() {
+  var statusEl = document.getElementById('psSyncStatus');
+  statusEl.textContent = 'Syncing...';
+  statusEl.className = 'pstate-sync-status syncing';
+
+  try {
+    var result = await PlatformState.syncToSupabase();
+    statusEl.textContent = 'Synced ' + new Date(result.ts).toLocaleTimeString();
+    statusEl.className = 'pstate-sync-status connected';
+    toast('Cloud sync complete', 'success');
+    loadPlatformStateTab();
+  } catch(err) {
+    statusEl.textContent = 'Sync failed';
+    statusEl.className = 'pstate-sync-status error';
+    toast('Cloud sync failed: ' + err.message, 'error');
+  }
+}
+
+async function restoreFromCloud() {
+  var statusEl = document.getElementById('psSyncStatus');
+  statusEl.textContent = 'Restoring...';
+  statusEl.className = 'pstate-sync-status syncing';
+
+  try {
+    var cloudState = await PlatformState.restoreFromSupabase();
+    if (!confirm('Overwrite local state with cloud backup from ' + (cloudState._meta ? cloudState._meta.exportedAt : 'unknown') + '?')) {
+      statusEl.textContent = 'Connected';
+      statusEl.className = 'pstate-sync-status connected';
+      return;
+    }
+
+    var result = PlatformState.restoreState(cloudState, { merge: false });
+    if (result.success) {
+      statusEl.textContent = 'Restored from cloud';
+      statusEl.className = 'pstate-sync-status connected';
+      toast('Restored from cloud backup', 'success');
+      loadPlatformStateTab();
+    } else {
+      throw new Error(result.error);
+    }
+  } catch(err) {
+    statusEl.textContent = 'Restore failed';
+    statusEl.className = 'pstate-sync-status error';
+    toast('Cloud restore failed: ' + err.message, 'error');
+  }
 }
 </script>
 </body>

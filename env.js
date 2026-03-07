@@ -33,6 +33,8 @@ var PatentifyEnv = (function() {
   var defaults = {
     API_BASE: '',                     // Backend proxy URL (empty = no proxy, use direct Anthropic calls)
     ANTHROPIC_API_KEY: '',            // Set in env.local.js or via UI
+    SUPABASE_URL: '',                 // Set in env.local.js or via Platform State UI
+    SUPABASE_ANON_KEY: '',            // Set in env.local.js or via Platform State UI
     DEFAULT_MODEL: 'claude-sonnet-4-20250514',
     MAX_TOKENS: 4096,
     ENABLE_PROMPT_CACHE: true,        // Enable Anthropic prompt caching (reduces cost ~90% on cache hits)
